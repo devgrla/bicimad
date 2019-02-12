@@ -31,6 +31,14 @@ ggmap(map.unizar) + geom_point(aes(x = longitude, y = latitude),
 
 
 
+dani <- readLines("C:/Users/Xseed/Google Drive/EAE/TFM - Datos y documentos/Datos y descripción/Datos/BiciMad/Bicimad_Estacions_201807.json")
+dani <- paste(dani, collapse = " ")
+x<- list(dani)
+class(x[[1]])
+tmp<-list(x[[1]])
+
+dani <- fromJSON(tmp[[1]])
 
 
-
+class(tmp[[1]])
+str(tmp[[1]])

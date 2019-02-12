@@ -1,0 +1,169 @@
+---
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reshape2)
+```
+
+## Contaminación Madrid - 2018
+
+Queremos trabajar sobre estos datos para ver después como afecta la contaminación (si es que afecta) en el uso de las bicicletas. Para esto necesitamos hacer el trabajo previo de lal impieza y transformación de estos datos
+
+**Los valores que importan son los siguientes:**
+   
+The AQI level is based on the level of six atmospheric pollutants, namely sulfur dioxide (SO2), nitrogen dioxide (NO2), suspended particulates smaller than 10 μm in aerodynamic diameter (PM10)suspended particulates smaller than 2.5 μm in aerodynamic diameter (PM2.5)，carbon monoxide (CO), and ozone (O3) measured at the monitoring stations throughout each city
+ 
+* 09 - PM 2.5
+* 10 - PM10
+* 14 - Ozono O3
+* 08 - Dioxido de nitrogeno NO2
+* 01 - Dioxido de Azufre SO2
+* 06 - Monoxido de carbono CO
+
+**Códigos de estaciones que usamos:**
+   
+Más céntricas
+ 
+* Retiro: 49
+* Plaza del carmen: 35
+* Castellana: 48
+
+En zonas mas alejadas está:
+* El pardo: 58
+* Casa de campo: 24
+
+**SOLO SON VALIDOS LOS VALORES QUE TIENEN UNA V**
+
+Los datos están esructurados en un formato ancho, donde cada columna es un día y cada fila corresponde a las observaciones de cada magnitud por mes y estación.
+
+```{r cars}
+data2018 <- read.csv("../dat/calidadaire2018.csv", encoding = 'UTF-8', sep=';')
+head(data2018)[1:15]
+```
+
+## Limpieza y transformación de datos.
+
+Empiezo a borrar columnas que ya se no voy a usar y elimino información de magnitudes y estaciones que no son de mi interés-
+
+```{r clean, include=FALSE}
+data2018.copy <- data2018
+```
+
+```{r clean2}
+data2018.copy <- data2018
+data2018.copy$PROVINCIA <- NULL
+data2018.copy$MUNICIPIO <- NULL
+data2018.copy$PUNTO_MUESTREO <- NULL
+```
+
+Solo interesan para este caso las estaciones y magnitudes descritas arriba
+
+```{r xx}
+
+estaciones_utilizar <- c(24,35,48,49,58)
+magnitudes_interes <- c(1,6,8,9,10,14)
+
+data2018.copy <- data2018.copy[data2018.copy$ESTACION %in% estaciones_utilizar,]
+data2018.copy <- data2018.copy[data2018.copy$MAGNITUD %in% magnitudes_interes,]
+
+```
+
+El formato existente no me sirve. Necesito un formato largo para tenes dias y valores como filas. Mi objetivo final es armar una columna que contenga la fecha correspondiente.
+
+``` {r melt}
+data2018.copy <- melt(data2018.copy, id.vars = c('ESTACION', 'MAGNITUD', 'ANO', 'MES'), na.rm = TRUE)
+head(data2018.copy)
+
+```
+
+Armo una columna nueva con la fecha definiendo una funcion que la arme.
+
+```{r fecha}
+
+get_date_from_columns <- function(year, month, day){
+  m <-regexpr("[0-9]+", day, perl=TRUE)
+  day<- regmatches(day, m)
+  as.Date(paste(year, month, day, sep='-'))
+}
+
+data2018.copy$fecha <- get_date_from_columns(data2018.copy$ANO, data2018.copy$MES, data2018.copy$variable) 
+data2018.copy <- data2018.copy[!is.na(data2018.copy$fecha),] #Elimino las fechas que no existen. Ejemplo 30/02, 31/06
+
+```
+
+Elimino de la columna variable los numeros, ya que no la voy a usar mas
+
+```{r convert}
+convert_to_only_letters <- function(variable){
+  m <-regexpr("[A-Z]+", variable, perl=TRUE)
+  letter<- regmatches(variable, m)
+  letter
+}
+
+data2018.copy$variable <- as.character(convert_to_only_letters(data2018.copy$variable))
+
+```
+
+## Filtrado solo valores que son validos y utlimas transformaciones
+
+Para cada día (variable D) necesito buscar su equivalente (variable V) según la fecha y verificar que el valor tomado para esa fecha sea válido. (Que no tenga value 'N')
+
+``` {r merge}
+
+data2018_formatted_D = data2018.copy[data2018.copy$variable == 'D',]
+data2018_formatted_V = data2018.copy[data2018.copy$variable == 'V',]
+
+data2018.copy = merge(data2018_formatted_D,data2018_formatted_V, by=c('fecha','MAGNITUD', 'ESTACION'))
+data2018.copy = data2018.copy[data2018.copy$value.y == 'V',] #Me quedo solo con las filas que tienen valor valido
+
+#Elimino las columnas que ya no me sirven
+data2018.copy$variable.y<-NULL
+data2018.copy$value.y<-NULL
+data2018.copy$MES.y<-NULL
+data2018.copy$ANO.y<-NULL
+data2018.copy$variable.x<-NULL
+
+#Cambio nombres de columnas para mejor manipulacion y tipos de datos
+colnames(data2018.copy) <- c('fecha', 'magnitud', 'estacion', 'ano', 'mes', 'medicion')
+data2018.copy$medicion <- as.numeric(data2018.copy$medicion)
+
+```
+
+## Resultado de transformaciones y filtrados.
+
+Cambio codigos de estaciones y magnitudes por sus textos correspondientes para que sean mas claros
+
+```{r cambiosTexto}
+data2018.copy[data2018.copy$estacion == 49,]$estacion <- 'Retiro'
+data2018.copy[data2018.copy$estacion == 35,]$estacion <- 'Plaza del carmen'
+data2018.copy[data2018.copy$estacion == 48,]$estacion <- 'Castellana'
+data2018.copy[data2018.copy$estacion == 58,]$estacion <- 'El Pardo'
+data2018.copy[data2018.copy$estacion == 24,]$estacion <- 'Casa de Campo'
+
+data2018.copy[data2018.copy$magnitud == 1,]$magnitud <- 'Dioxido de Azufre SO2'
+data2018.copy[data2018.copy$magnitud == 6,]$magnitud <- 'Monoxido de carbono CO'
+data2018.copy[data2018.copy$magnitud == 8,]$magnitud <- 'Dioxido de nitrogeno NO2'
+data2018.copy[data2018.copy$magnitud == 9,]$magnitud <- 'PM 2.5'
+data2018.copy[data2018.copy$magnitud == 10,]$magnitud <-'PM10'
+data2018.copy[data2018.copy$magnitud == 14,]$magnitud <-'Ozono3'
+
+```
+
+Muestra de la tabla con los cambios
+```
+
+```{r table}
+head(data2018.copy)
+```
+
+```
+
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

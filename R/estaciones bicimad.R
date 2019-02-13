@@ -14,7 +14,7 @@ stations<- ldply(stations$stations, as.data.frame) #Tomo una lista y la conviert
 
 stations$latitude <- as.numeric(as.character(stations$latitude))
 stations$longitude <- as.numeric(as.character(stations$longitude))
-
+stations$ocupacion <- (stations$dock_bikes / stations$total_bases) * 100
 
 unizar <- geocode('Teatro Amaya, Madrid, España', 
                   source = "google")
@@ -29,16 +29,28 @@ ggmap(map.unizar) + geom_point(aes(x = longitude, y = latitude),
                                data = stations, colour = 'red',
                                size = 2)
 
+get_status <- function(ocupacion){
+  if(ocupacion> 75){
+    return ('Disponibilidad > 75%')
+  } else if (ocupacion > 50 & ocupacion < 75 ){
+    return('Disponibilidad 50-75%')
+  } else if (ocupacion > 25 & ocupacion < 50 ){
+    return('Disponibilidad 25-50%')
+  } else{
+    return('Disponibilidad < 25%')
+  }
+}
 
 
-dani <- readLines("C:/Users/Xseed/Google Drive/EAE/TFM - Datos y documentos/Datos y descripción/Datos/BiciMad/Bicimad_Estacions_201807.json")
-dani <- paste(dani, collapse = " ")
-x<- list(dani)
-class(x[[1]])
-tmp<-list(x[[1]])
+stations$estado_estacion <- ''
 
-dani <- fromJSON(tmp[[1]])
+for (i in 1:nrow(stations)) {
+  n <- get_status(stations[i,14])
+  print(n)
+  stations$estado_estacion[i] <- n
+}
 
 
-class(tmp[[1]])
-str(tmp[[1]])
+ggmap(map.unizar) + geom_point(aes(x = longitude, y = latitude,colour=estado_estacion),
+                               data = stations,
+                               size = 2)

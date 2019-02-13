@@ -158,7 +158,7 @@ head(data2018.copy)
 ```
 
 ```
-
+## Distribución de
 
 You can also embed plots, for example:
 

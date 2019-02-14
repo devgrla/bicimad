@@ -18,7 +18,8 @@ Se analizan varias fuentes de datos por separado. Se encuentran los siguientes a
 * **Usos por día** . Se analiza según los datos obtenidos del catalogo abierto de madrid, los usos de las biciletas según distintos criterios, en el periodo 2015- 2018.
 * **Accidentes con implicaciones de bicicleta 2018 - Madrid**
 Se obtienen los datos de los accidentes con implicaciones de bicicletas. En la tabla miden el numero de victimas, la edad, el sexo, el distrito, la dirección y algunas condiciones climaticas y del estado del suelo. El archivo fue obtenido desde el catálogo de datos abiertos.
-
+* **Bicis usos vs clima**
+Se obtienen los datos del uso del sistema Bicimad, los cuales cuentan con fecha por día, tipo de usuario (Abonado anual/Abonado ocasional) y cantidades de uso por tipo de usuario. Adicionalmente se realiza un cruce con la base de datos del clima para identificar posibles relaciones entre la lluvia y la temperatura con el uso de las bicicletas.
 
 ## R
 

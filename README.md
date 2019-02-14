@@ -4,15 +4,18 @@ Proyecto para visualización de datos de bicimad.
 Aprovechamos la ocasión, para insertar los datos limpios y tranformados en la base de datos que nos obligan armar para el TFM. Por eso puede que en algun archivo exista código con tal fin. En la mayoría de los casos, está comentado para que no vuelva a ejecutarse.
 
 Hay 3 carpetas dentro del repositorio.
-- **data** que contiene los archivos con los datos utilizados para el análisis tanto en R como en Python.
+- **dat** que contiene los archivos con los datos utilizados para el análisis tanto en R como en Python.
 - **R** que contiene los scripts y markdowns de R.
 - **Python** que contiene los notebook del análisis realizado en Python
 
 ## Python
 
+Se analizan varias fuentes de datos por separado. Se encuentran los siguientes archivos:
 
-
-
+* **Calidad del aire - Madrid** . Analiza los datos de la contaminación de Madrid en el período 2015-2018. Los datos fueron obtenidos desde el catálogo de datos abierto
+* **Clima Madrid** .  Se obtienen los datos desde el 2015 a principios de febrero 2019, a través de la Api de la AEMET. Esos datos están descargados en un archivo en la carpeta dat. De todas formas se puede consultar la API para cualquier periodo y utilizar esos datos en el análisis (Está explicado en el notebook)
+* **Estaciones Bicimad en tiempo real** . Se obtiene la información del estado de las situaciones de Bicimad en tiempo real (mediante API) y se visualiza en mapa cada una diferenciandose según la disponibilidad que tengan en ese momento. Además se aprovecha esa información para guardar en BD las estaciones y su información general.
+* **Usos por día** . Se analiza según los datos obtenidos del catalogo abierto de madrid, los usos de las biciletas según distintos criterios, en el periodo 2015- 2018
 
 
 ## R

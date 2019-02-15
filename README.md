@@ -23,7 +23,8 @@ Se obtienen los datos del uso del sistema Bicimad, los cuales cuentan con fecha 
 
 ## R
 
-
+* **Calidad del aire**. Analiza los datos de la contaminación de Madrid en el periodo 2015-2018. Los datos fueron obtenidos desde el catálogo de datos abiertos.
+Hay dos archivos. _"Calidad del aire.rmd"_ donde se puede visualizar el código y un archivo llamado _"Calidad del aire.html"_ donde ya se visualiza el markdown ejecutado en formato Html. Para visualizar el resultado, se recomienda ir directo al archivo html ya que el markdown tarda un poco en completar de ejecutarse, debido a varios calculos que realiza.
 
 
 ## data

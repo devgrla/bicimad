@@ -2,7 +2,7 @@ library(rjson)
 library(dplyr)
 library(plyr)
 
-kk <- readLines("data/Bicimad_Stations_201811.json", encoding='UTF-8')
+kk <- readLines("dat/Bicimad_Stations_201811.json")
 kk= paste(kk, collapse="")
 tmp <- fromJSON(kk)
 

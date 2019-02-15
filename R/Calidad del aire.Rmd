@@ -1,0 +1,317 @@
+---
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(lubridate)
+```
+
+## Contaminación Madrid - 2018
+
+Queremos trabajar sobre estos datos para ver después como afecta la contaminación (si es que afecta) en el uso de las bicicletas. Para esto necesitamos hacer el trabajo previo de la impieza y transformación de estos datos.
+
+**Los valores que importan son los siguientes:**
+   
+The AQI level is based on the level of six atmospheric pollutants, namely sulfur dioxide (SO2), nitrogen dioxide (NO2), suspended particulates smaller than 10 μm in aerodynamic diameter (PM10)suspended particulates smaller than 2.5 μm in aerodynamic diameter (PM2.5)，carbon monoxide (CO), and ozone (O3) measured at the monitoring stations throughout each city
+ 
+* 09 - PM 2.5
+* 10 - PM10
+* 14 - Ozono O3
+* 08 - Dioxido de nitrogeno NO2
+* 01 - Dioxido de Azufre SO2
+* 06 - Monoxido de carbono CO
+
+**Códigos de estaciones que usamos:**
+   
+Más céntricas
+ 
+* Retiro: 49
+* Plaza del carmen: 35
+* Castellana: 48
+
+En zonas mas alejadas está:
+* El pardo: 58
+* Casa de campo: 24
+
+Los datos están esructurados en un formato ancho, donde cada columna es un día y cada fila corresponde a las observaciones de cada magnitud por mes y estación.
+
+**SOLO SON VALIDOS LOS VALORES QUE TIENEN UNA V**
+
+Se toman valores en el `período 2015 - 2018`
+
+
+```{r cars}
+data2018 <- read.csv("../dat/calidadaire2018.csv", encoding = 'UTF-8', sep=';')
+data2017 <- read.csv("../dat/calidadaire2017.csv", encoding = 'UTF-8', sep=';')
+data2016 <- read.csv("../dat/calidadaire2016.csv", encoding = 'UTF-8', sep=';')
+data2015 <- read.csv("../dat/calidadaire2015.csv", encoding = 'UTF-8', sep=';')
+
+data_total <- rbind(data2015, data2016, data2017, data2018)
+
+head(data_total)[1:15] #El resto de las columnas corresponden al resto de los días del mes.
+```
+
+## Limpieza y transformación de datos.
+
+Empiezo a borrar columnas que ya se no voy a usar y elimino información de magnitudes y estaciones que no son de mi interés-
+
+```{r clean, include=FALSE}
+data.copy <- data_total
+```
+
+```{r clean2}
+data.copy$PROVINCIA <- NULL
+data.copy$MUNICIPIO <- NULL
+data.copy$PUNTO_MUESTREO <- NULL
+```
+
+Solo interesan para este caso las estaciones y magnitudes descritas arriba
+
+```{r xx}
+
+estaciones_utilizar <- c(24,35,48,49,58)
+magnitudes_interes <- c(1,6,8,9,10,14)
+
+data.copy <- data.copy[data.copy$ESTACION %in% estaciones_utilizar,]
+data.copy <- data.copy[data.copy$MAGNITUD %in% magnitudes_interes,]
+
+```
+
+El formato existente no me sirve. Necesito un formato largo para tenes dias y valores como filas. Mi objetivo final es armar una columna que contenga la fecha correspondiente.
+
+``` {r melt, warning=FALSE}
+data.copy <- melt(data.copy, id.vars = c('ESTACION', 'MAGNITUD', 'ANO', 'MES'), na.rm = TRUE)
+head(data.copy)
+```
+
+Armo una columna nueva con la fecha definiendo una funcion que la genere. Elimino los que quedan con fecha NULL ya que son fechas que no existe y cuyos valores no son válidos.
+
+```{r fecha}
+
+get_date_from_columns <- function(year, month, day){
+  m <-regexpr("[0-9]+", day, perl=TRUE)
+  day<- regmatches(day, m)
+  as.Date(paste(year, month, day, sep='-'))
+}
+
+data.copy$fecha <- get_date_from_columns(data.copy$ANO, data.copy$MES, data.copy$variable) 
+data.copy <- data.copy[!is.na(data.copy$fecha),] #Elimino las fechas que no existen. Ejemplo 30/02, 31/06
+
+```
+
+Elimino de la columna variable los numeros, ya que no la voy a usar mas
+
+```{r convert}
+convert_to_only_letters <- function(variable){
+  m <-regexpr("[A-Z]+", variable, perl=TRUE)
+  letter<- regmatches(variable, m)
+  letter
+}
+
+data.copy$variable <- as.character(convert_to_only_letters(data.copy$variable))
+
+```
+
+## Filtrado solo valores que son válidos y últimas transformaciones
+
+Para cada día (variable D) necesito buscar su equivalente (variable V) según la fecha y verificar que el valor tomado para esa fecha sea válido. (Que no tenga value 'N')
+
+``` {r merge}
+
+data2018_formatted_D = data.copy[data.copy$variable == 'D',]
+data2018_formatted_V = data.copy[data.copy$variable == 'V',]
+
+data.copy = merge(data2018_formatted_D,data2018_formatted_V, by=c('fecha','MAGNITUD', 'ESTACION'))
+data.copy = data.copy[data.copy$value.y == 'V',] #Me quedo solo con las filas que tienen valor valido
+
+#Elimino las columnas que ya no me sirven
+data.copy$variable.y<-NULL
+data.copy$value.y<-NULL
+data.copy$MES.y<-NULL
+data.copy$ANO.y<-NULL
+data.copy$variable.x<-NULL
+
+#Cambio nombres de columnas para mejor manipulacion y tipos de datos
+colnames(data.copy) <- c('fecha', 'magnitud', 'estacion', 'ano', 'mes', 'medicion')
+data.copy$medicion <- as.numeric(data.copy$medicion)
+
+```
+
+## Resultado de transformaciones y filtrados.
+
+Cambio códigos de estaciones y magnitudes por sus textos correspondientes para que sean mas claros
+
+```{r cambiosTexto}
+data.copy[data.copy$estacion == 49,]$estacion <- 'Retiro'
+data.copy[data.copy$estacion == 35,]$estacion <- 'Plaza del carmen'
+data.copy[data.copy$estacion == 48,]$estacion <- 'Castellana'
+data.copy[data.copy$estacion == 58,]$estacion <- 'El Pardo'
+data.copy[data.copy$estacion == 24,]$estacion <- 'Casa de Campo'
+
+data.copy[data.copy$magnitud == 1,]$magnitud <- 'Dioxido de Azufre SO2'
+data.copy[data.copy$magnitud == 6,]$magnitud <- 'Monoxido de carbono CO'
+data.copy[data.copy$magnitud == 8,]$magnitud <- 'Dioxido de nitrogeno NO2'
+data.copy[data.copy$magnitud == 9,]$magnitud <- 'PM 2.5'
+data.copy[data.copy$magnitud == 10,]$magnitud <-'PM10'
+data.copy[data.copy$magnitud == 14,]$magnitud <-'Ozono3'
+
+```
+
+**Muestra de la tabla con los cambios realizados**
+
+
+```{r table, echo=FALSE}
+head(data.copy)
+```
+
+
+# Visualización de datos
+
+A continuación se realiza un conjunto de análisis sobre los contaminantes y su comportamiento en el período 2015 - 2018. Nos vamos a centrar más que nada en el Dioxido de Nitrógeno (NO2), que es el que mas afecta la ciudad y por el cual se activan los protocolos de contaminación.
+
+En el siguiente gráfico se pueden visualizar los máximos para cada magnitud del estudio en el período analizado.
+
+```{r pressure}
+tmp<- ddply(data.copy, .(ano, magnitud), summarize, maximos = max(medicion))
+
+ggplot(tmp, aes(x = magnitud, maximos, fill=magnitud)) + geom_col() + facet_grid(. ~ ano) + theme(axis.text.x =element_blank(),axis.ticks = element_blank()) +scale_fill_brewer(palette="Dark2") +
+  labs(title="Máximos anuales por contaminante",x="Magnitud", y = "Máximos")
+
+```
+
+En el gráfico se ve que mas o menos los máximos se mantienen en los últimos 4 años. Solamente hay una gran diferencia en el PM10 para el año 2016 con respecto al resto. Estaría bueno ver como ha sido la distribución por ejemplo del Dióxido de nitrogeno (en promedio por mes), que es por el cual se activan los protocolos de contaminación.
+
+Se muestra la distribución de este contaminante en los últimos 4 años, añadiendo la media anual correspondiente.
+
+```{r dist}
+data_tmp = data.copy[data.copy$magnitud == 'Dioxido de nitrogeno NO2',]
+data_tmp$ano <- as.factor(as.character(data_tmp$ano))
+media<- ddply(data_tmp, .(ano, magnitud), summarize, media = mean(medicion))
+media$ano <- as.factor(as.character(media$ano))
+
+
+ggplot(data_tmp, aes(x=medicion, colour=ano)) + geom_density() +
+  geom_vline(data=media, aes(xintercept=media,  colour=ano),
+             linetype="dashed", size=1) + theme() +
+  labs(title="Distribución medición por año NO2",x="Medición", y = "Densidad")
+
+```
+
+
+Parecería que los niveles han ido mejorando y que en el 2018 los valores se encuentran mas a la izquierda del gráfico. Incluso la media del 2018 fue un poco menor a los años anteriores.
+
+Quiero ver a continuación la media mes a mes entre estos años para ver si han existido mejoras.
+
+```{r media}
+
+data_tmp2<- ddply(data_tmp, .(ano, mes), transform, media_mensual = mean(medicion))
+
+ggplot(data_tmp2, aes(x=mes, y =media_mensual, colour=ano)) + geom_line() + theme_minimal() +
+  labs(title="Media Dioxido de nitrogeno NO2 por mes 2015 - 2018",x="Mes", y = "Medición")
+
+```
+
+La media del Dioxido de nitrogeno NO2 en el 2018 es más baja en más de la mitad de los meses con respecto a los años anteriores, lo cual supone una mejoría en este sentido, determinado más que nada por la disminución en aquellos meses como noviembre, diciembre y enero donde los niveles son más altos en general.
+
+# Activación Protocolos de contaminación 2018
+
+En 2018 los protocolos de contaminación se activaron 4 veces por Dioxido de Nitrogeno.
+
+* NO2 del 23 al 24 de enero
+* NO2 del 5 al 7 de diciembre de 2018
+* NO2 del 11 al 12 de diciembre de 2018
+* NO2 del 25 al 28 de diciembre de 2018
+
+Los valores de esos días para retiro fueron:
+
+```{r protocolo , echo=FALSE}
+
+data_tmp2 <- data.copy
+data_tmp2 <- data_tmp2[(data_tmp2$magnitud == 'Dioxido de nitrogeno NO2') & (data_tmp2$estacion == 'Retiro') & 
+                      (data_tmp2$fecha %in% c(as.Date("2018-12-5"), as.Date("2018-12-12"), as.Date("2018-12-25"),as.Date("2018-12-6"),
+                                              as.Date("2018-12-26"), as.Date("2018-12-27"), as.Date("2018-12-28"), 
+                                              as.Date("2018-1-23"), as.Date("2018-1-24"), as.Date("2018-12-7"))),]
+row.names(data_tmp2)<-NULL
+data_tmp2[,c(1,6)]
+
+```
+
+
+Si se comparan con la media anual que se ve un par de gráficos antes (**29.36**), los valores de estos días son ampliamente superiores.
+
+## Qué pasaba esos días en las estaciones fuera del centro?
+
+Se quiere analizar si hay una diferencia significativa en los días que se activa el protocolo entre por ejemplo Retiro y El Pardo, que están relativamente cerca en cuanto a distancia pero son muy distintas en cuanto a densidad de población y tráfico.
+
+Estos son los valores de `El Pardo` para los días en que se activó el protocolo.
+
+```{r protocolo2}
+
+data_tmp3 <- data.copy
+data_tmp3 <- data_tmp3[(data_tmp3$magnitud == 'Dioxido de nitrogeno NO2') & (data_tmp3$estacion == 'El Pardo') & 
+                      (data_tmp3$fecha %in% c(as.Date("2018-12-5"), as.Date("2018-12-12"), as.Date("2018-12-25"),as.Date("2018-12-6"),
+                                              as.Date("2018-12-26"), as.Date("2018-12-27"), as.Date("2018-12-28"), 
+                                              as.Date("2018-1-23"), as.Date("2018-1-24"), as.Date("2018-12-7"))),]
+row.names(data_tmp3)<-NULL
+data_tmp3[,c(1,6)]
+
+```
+
+Los valores de El pardo difieren bastante de los registrados en la estación Retiro y son más próximos a la media anual. Para visualizar mejor esta diferencia, se puede observar el siguiente gráfico:
+
+
+```{r protocolo3}
+
+data_tmp4 <- rbind(data_tmp2, data_tmp3)
+
+ggplot(data_tmp4, aes(x=fecha, y =medicion, colour=estacion)) + geom_line() + theme_minimal() +
+  labs(title="Mediciones en días de protocolos de contaminación Retiro vs El Pardo",x="Fecha", y = "Medición")
+
+```
+
+Las diferencias son bastante significativas.
+
+Si hago el promedio anual entre ambas estaciones veo los siguientes resultados, donde el promedio de retiro es anualmente casi el doble.
+
+```{r protocolo4}
+
+data_tmp <- data.copy[(data.copy$magnitud == 'Dioxido de nitrogeno NO2') & (data.copy$estacion %in% c('El Pardo','Retiro')),]
+data_tmp<- ddply(data_tmp, .(ano, estacion), summarize, media_estacion = mean(medicion))
+ggplot(data_tmp, aes(x=ano, media_estacion, fill=estacion)) + geom_col(position="dodge") + theme() +
+  labs(title="Promedio anual estaciones céntricas y fuera de madrid",x="Año", y = "Medición") + scale_fill_brewer(palette="Dark2")
+
+```
+
+# Contaminantes promedio por estación
+
+Para ver el comportamiento promedio de los contaminantes según la estación del año, creamos una columna que dada la fecha nos determine la estación del año.
+
+```{r get_season}
+
+
+f<- function(x) {
+  date <- as.Date(x[1])
+  if (date >= as.Date(paste(year(ymd(date)),'03-21', sep='-', collapse = NULL)) & date <= as.Date(paste(year(ymd(date)),'06-20', sep='-', collapse = NULL)))
+    return('Primavera')
+  if (date >= as.Date(paste(year(ymd(date)),'06-21', sep='-', collapse = NULL)) & date <=  as.Date(paste(year(ymd(date)),'09-20', sep='-', collapse = NULL)))
+    return('Verano')
+  if (date >= as.Date(paste(year(ymd(date)),'09-21', sep='-', collapse = NULL)) & date <=  as.Date(paste(year(ymd(date)),'12-20', sep='-', collapse = NULL)))
+    return('Otoño')
+  else
+    return('Invierno')
+}
+
+data.copy$estacion_del_ano<- apply(data.copy, 1, f)
+
+data_tmp <- data.copy[data.copy$estacion %in% c('Retiro','Plaza del carmen', 'Castellana'),]
+data_tmp<- ddply(data_tmp, .(estacion_del_ano, magnitud), summarize, media_estacion = mean(medicion))
+ggplot(data_tmp, aes(x=estacion_del_ano, media_estacion, fill=magnitud)) + geom_col( position="dodge") + theme() +
+  labs(title="Promedio contaminantes por estación del año en zonas céntricas",x="Estación del año", y = "Medición") + scale_fill_brewer(palette="Dark2")
+
+
+```
+
+Vemos que en zonas céntricas, el dioxido de nitrogeno tiene valores en promedio que son superiores en Otoño y en Invierno, lo cual tiene sentido en cuanto a los protocolos de contaminación activados.

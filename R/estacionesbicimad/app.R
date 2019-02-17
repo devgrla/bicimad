@@ -35,8 +35,8 @@ stations$estado_estacion <- apply(stations, 1, get_status)
 ui <- fluidPage(
   
   # App title ----
-  titlePanel("Tabsets"),
-  
+  titlePanel("Estaciones bicimad en tiempo real"),
+
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
     
@@ -94,7 +94,7 @@ server <- function(input, output) {
                           scale = 4,
                           zoom = 13)
     
-    ggmap(map.unizar, legend = "topleft") + geom_point(aes(x = longitud, y = latitud,colour=estado_estacion ,size = ocupacion), alpha = .7,
+    ggmap(map.unizar, legend = "topleft") + geom_point(aes(x = longitud, y = latitud,colour=estado_estacion), alpha = .7,
                                    data = tmp,
                                    size = 6)   +  theme(legend.position = "top",
                                                       legend.title = element_blank(),

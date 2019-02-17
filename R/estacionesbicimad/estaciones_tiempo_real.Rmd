@@ -1,0 +1,91 @@
+---
+title: "Estaciones Bicimad en Tiempo Real"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(jsonlite)
+library(plyr)
+library(dplyr)
+```
+
+Este documento se consulta la API en tiempo real de la EMT sobre el estado en tiempo real de las estaciones. Se hace de forma interactiva con Shiny, de forma de que se pueda visualiar una o más estaciones en particular, asi como también la cantidad de bicicletas disponibles en cada una de ellas.
+
+La consulta a la API se realiza en la siguiente sección
+
+```{r api}
+
+res <- fromJSON('https://rbdata.emtmadrid.es:8443/BiciMad/get_stations/WEB.SERV.gaston@gutrade.io/1326B978-2486-479C-B76E-15C4838F9345')
+
+stations<- fromJSON(res$data)$stations
+
+#Elimino algunas columnas del dataframe y le cambio el nombre a las columnas
+stations$light <- NULL
+stations$activate <- NULL
+stations$no_available <- NULL
+colnames(stations) <- c('id', 'latitud', 'longitud', 'nombre', 'numero', 'direccion', 'total_bases', 'total_disponibles', 'total_ocupadas', 'reservas')
+stations$latitud <- as.numeric(as.character(stations$latitud))
+stations$longitud <- as.numeric(as.character(stations$longitud))
+
+```
+
+
+```{r eruptions, echo=FALSE}
+sidebarLayout(
+    
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+       selectInput(inputId = "station",
+                  label = "Seleccionar estación:",
+                  choices = stations$nombre,
+                  multiple = TRUE),
+      
+      checkboxGroupInput(inputId = "selected_var",
+                         label = "Seleccionar atributos de estación:",
+                         choices = names(stations),
+                         selected = c("nombre", "direccion"))
+        
+      ),
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+      
+       # Output: tabsets
+      tabsetPanel(type = "tabs",
+                  tabPanel("Mapa", plotOutput("stationsMap", width = '100%', height = 800)),
+                  tabPanel("Información estación", DT::dataTableOutput("tablaEstaciones")))
+    )
+  )
+
+renderPlot({
+  hist(faithful$eruptions, probability = TRUE, breaks = as.numeric(input$n_breaks),
+       xlab = "Duration (minutes)", main = "Geyser eruption duration")
+  
+  dens <- density(faithful$eruptions, adjust = input$bw_adjust)
+  lines(dens, col = "blue")
+})
+```
+
+## Embedded Application
+
+It's also possible to embed an entire Shiny application within an R Markdown document using the `shinyAppDir` function. This example embeds a Shiny application located in another directory:
+
+```{r tabsets, echo=FALSE}
+shinyAppDir(
+  system.file("examples/06_tabsets", package = "shiny"),
+  options = list(
+    width = "100%", height = 550
+  )
+)
+```
+
+Note the use of the `height` parameter to determine how much vertical space the embedded application should occupy.
+
+You can also use the `shinyApp` function to define an application inline rather then in an external directory.
+
+In all of R code chunks above the `echo = FALSE` attribute is used. This is to prevent the R code within the chunk from rendering in the document alongside the Shiny components.
+
+
+

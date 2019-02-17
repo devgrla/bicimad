@@ -26,6 +26,6 @@ Se obtienen los datos del uso del sistema Bicimad, los cuales cuentan con fecha 
 * **Calidad del aire**. Analiza los datos de la contaminación de Madrid en el periodo 2015-2018. Los datos fueron obtenidos desde el catálogo de datos abiertos.
 Hay dos archivos. _"Calidad del aire.rmd"_ donde se puede visualizar el código y un archivo llamado _"Calidad del aire.html"_ donde ya se visualiza el markdown ejecutado en formato Html. Para visualizar el resultado, se recomienda ir directo al archivo html ya que el markdown tarda un poco en completar de ejecutarse, debido a varios calculos que realiza.
 
-* **Estaciones bicimad en tiempo real**. Dentro de la carpeta R, existe una carpeta llamada "estacionesbicimad" que contiene una aplicación shiny para mostrar de forma interactiva la disponibilidad de bicicletas y la información de lsa estaciones en tiempo real, utilizando una API con tal fin.
+* **Estaciones bicimad en tiempo real**. Dentro de la carpeta R, existe una carpeta llamada "estacionesbicimad" que contiene un markdown integrado con una aplicación shiny para mostrar de forma interactiva la disponibilidad de bicicletas y la información de lsa estaciones en tiempo real, utilizando una API con tal fin.
 
 ## data

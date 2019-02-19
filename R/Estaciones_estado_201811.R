@@ -50,15 +50,16 @@ map <- get_map(location = 'Madrid', zoom = 13, maptype = "terrain")
 
 # pintamos los puntos de nuestro data frame en el mapa
 biciMAD <- ggmap(map) + geom_point(data=prueba, aes(x=longitude, y=latitude, colour=porcentaje_bicis),
-                                 alpha = 0.6, show.legend = FALSE, size=4)
+                                   alpha = 0.6, show.legend = FALSE, size=4)
 
 
 # generamos el mapa
 biciMAD
 
 
-ciudad <- get_map("Madrid, España", zoom=13)
+ciudad <- get_map("Madrid, EspaÃ±a", zoom=13)
 p      <- ggmap(ciudad)
 p      <- p+stat_density2d(aes(x = longitude, y = latitude, fill=porcentaje_bicis), 
                            data=prueba,geom="polygon", alpha=0.2)
 p + scale_fill_gradient(low = "yellow", high = "red")
+

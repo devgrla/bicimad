@@ -14,7 +14,7 @@ library(shiny)
 library(ggmap)
 library(ggplot2)
 
-kk <- readLines("dat/Bicimad_Stations_201811.json", encoding='ISO-8859-1')
+kk <- readLines("https://dev.gutrade.io/gaston/Bicimad_Stations_201811.json")
 kk= paste(kk, collapse="")
 tmp <- fromJSON(kk)
 
@@ -57,13 +57,7 @@ register_google("AIzaSyCjQ7z4QwZUU7l1U8iBJ6ASX_srvbdZfNk", write = TRUE)
 map <- get_map(location = 'Madrid', zoom = 13, maptype = "terrain")
 ```
 
-This R Markdown document is made interactive using Shiny. Unlike the more traditional workflow of creating static reports, you can now create documents that allow your readers to change the assumptions underlying your analysis and see the results immediately. 
 
-To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authoring_shiny.html).
-
-## Inputs and Outputs
-
-You can embed Shiny inputs and outputs in your document. Outputs are automatically updated whenever inputs change.  This demonstrates how a standard R plot can be made interactive by wrapping it in the Shiny `renderPlot` function. The `selectInput` and `sliderInput` functions create the input widgets used to drive the plot.
 
 ```{r eruptions, echo=FALSE}
 inputPanel(

@@ -1,0 +1,135 @@
+# Accidente Bicicletas 2018
+
+![](https://www.indemnizacionmaxima.com/images/biker.png)
+
+## Librerias a importar
+```{r}
+library(reshape2)
+library (dplyr)
+library(ggplot2)
+```
+
+# Origen de base de datos
+
+[Base de datos](https://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1a5a0/?vgnextoid=20f4a87ebb65b510VgnVCM1000001d4a900aRCRD&vgnextchannel=374512b9ace9f310VgnVCM100000171f5a0aRCRD&vgnextfmt=default) 
+
+
+```{r}
+setwd("C:/Users/dgste/bicimad/")
+ac_2018 <- read.delim("dat/AccidentesBicicletas_2018.csv", sep = ";", header = TRUE)
+``` 
+
+# Limpieza de datos
+
+Lo primero que hacemos es llevar a cabo una copia con el fin de no sobreescribir los datos.
+
+```{r}
+ac <- ac_2018
+```
+
+Luego, el siguiente paso es analizar a través del summary, typeof los datos de nuestra tabla. Esto nos darÃ¡n una imagen más avanzada de nuestros datos.
+
+```{r}
+summary(ac)
+typeof(ac)
+```
+
+Los datos nos muestran que en la tabla, existen una serie de campos que nos dan poca información. El equipo ha tomado la decisión de eliminarlos para tener una tabla más pequeña, que nos será útil al siguiente paso de renombrar las columnas para llamarlas de una forma mas manejable.
+
+```{r}
+colnames(ac)
+ac[c(8,9,11,13,15:16,19)] <- list(NULL)
+```
+
+Luego, como comentamos, modificaremos el nombre de los campos para unos sin espacios y en minusculas.
+
+```{r}
+colnames(ac) <- c("fecha","hora","dia_semana","distrito","lugar_accidente","Numero_accidente","n_parte","cpfa_lluvia","cpfa_seco","cpsv.mojada","cpsv_grava_suelta","cpsv_hielo","n_victimas","tipo_accidente","tipo_vehiculo","tipo_persona","sexo","lesividad","edad")
+```
+
+Observamos que los campos que debemos cambiar son los siguientes:
+
+  * Fecha (lo pondremos en formato fecha)
+  * Rango.Horario (dejaremos solo la hora inicial, ya que vemos que los datos muestran un intervalo de una hora y quitaremos los "De" y los "A".
+  * Tramo.edad (haremos un procedimiento parecido al de horario)
+
+##Fechas
+
+### Cambiamos primero el formato fechas
+```{r} 
+ac$fecha <- as.Date(ac$fecha, "%d/%m/%Y")
+```
+###agregamos la columna mes y ponemos el mes en cuestion.
+```{r}
+ac$mes <- format(ac$fecha, "%m") 
+```
+###agregamos la columna dia y ponemos el dia en cuestion.
+```{r}
+ac$dia <- format(ac$fecha, "%d")
+```
+###vemos como va a tabla
+```{r}
+tail(ac)
+```
+
+##Hora
+
+###Quitamos los "DE" y la hora que se encuentra después de la "A" y vemos el resultado.
+```{r}
+ac$hora <- gsub("DE ", "",ac$hora)
+ac$hora <- gsub("A [0-9]+:[0-9]+$", "",ac$hora)
+ac$hora <- gsub(" ", "",ac$hora)
+head(ac)
+```
+##tramo.edad
+
+###Quitamos los "DE" y la hora que se encuentra después de la "A" y vemos el resultado.
+```{r}
+ac$edad <- gsub("DE ", "",ac$edad)
+ac$edad <- gsub("A [0-9]+ AÑOS", "",ac$edad)
+ac$edad <- gsub("A [0-9][0-9] ANOS", "",ac$edad)
+ac$edad <- gsub(" ", "",ac$edad)
+head(ac)
+```
+
+###Eliminamos un outlier donde hubo un accidente en un autobus con 13 victimas
+```{r}
+y <- ac[ac$n_victimas< 14,]
+
+```
+
+# Visualizacion
+
+## Graficos de barras
+
+* Este grafico busca analizar las diferencias entre el numero de victimas hombres y mujeres a lo largo del año
+
+```{r}
+
+#agrupación por mes y sexo sumando el numero de victimas
+ac_3 <- y %>%
+  group_by(mes, sexo) %>%
+  summarize(n.victimas = sum(n_victimas, na.rm = TRUE))
+
+#llamada del grafico
+ggplot(data=ac_3, aes(x=mes, y=n.victimas, fill=sexo)) + 
+  geom_bar(stat="identity", position="dodge")
+
+```
+
+* Este grafico muestra la evolucion de la variable numero de victimas a lo largo del año.
+
+```{r}
+ac_3 <- y %>%
+  group_by(mes) %>%
+  summarize(n.victimas = sum(n_victimas, na.rm = TRUE))
+
+ggplot(data = ac_3, mapping = aes(x = mes, y = n.victimas, group=1))+
+  geom_line()+
+  geom_point(colour="black", size=2, shape=21, fill="black")
+
+```
+
+
+
+

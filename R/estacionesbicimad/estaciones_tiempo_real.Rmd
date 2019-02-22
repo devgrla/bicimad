@@ -15,7 +15,7 @@ library(DT)
 library(ggmap)
 ```
 
-Este documento se consulta la API en tiempo real de la EMT sobre el estado en tiempo real de las estaciones. Se hace de forma interactiva con Shiny, de forma de que se pueda visualizar una o más estaciones en particular, asi como también la cantidad de bicicletas disponibles en cada una de ellas.
+En este documento se consulta la API en tiempo real de la EMT sobre el estado en tiempo real de las estaciones de bicimad. Se hace de forma interactiva con Shiny, para que se pueda visualizar una o más estaciones en particular, asi como también la cantidad de bicicletas disponibles en cada una de ellas y su estado de ocupación.
 
 La consulta a la API se realiza en la siguiente sección
 
@@ -32,8 +32,11 @@ stations$no_available <- NULL
 colnames(stations) <- c('id', 'latitud', 'longitud', 'nombre', 'numero', 'direccion', 'total_bases', 'total_disponibles', 'total_ocupadas', 'reservas')
 stations$latitud <- as.numeric(as.character(stations$latitud))
 stations$longitud <- as.numeric(as.character(stations$longitud))
+
+#Creo columna para definir la ocupación de la estación en cuanto a cantidad de bicicletas disponibles.
 stations$ocupacion <- (stations$total_disponibles / stations$total_bases) * 100
 
+#Defino función para establecer criterios de ocupación.
 get_status <- function(x){
   ocupacion<- as.numeric(x[11])
   if(ocupacion> 75){
@@ -53,15 +56,16 @@ stations$estado_estacion <- apply(stations, 1, get_status)
 
 ## Resultado
 
-Existen dos pestañas:
+En primer lugar se muestra el código realizado para implementar los resultados utilizando Shiny. Debajo de éste existen dos pestañas:
 
 * **"Mapa"** - Se muestra en mapa la ubicación de las estaciones, diferenciándolas según la disponibilidad que tengan en ese momento. Debajo del mapa de puede visualizar por cada estación, la cantidad de bases y de bicicletas disponibles.
+
 * **Información estación** - Se muestra en tabla, la información de las estaciones seleccionadas, pudiendo elegir las variables que se muestran en los filtros.
 
 Se puede filtrar por una o varias estaciones, pudiendo seleccionar además las variables a mostrar. Por defecto se visualiza nombre y dirección de la estación.
 
 
-```{r tabsets, echo=FALSE}
+```{r tabsets}
 shinyApp(
   
   ui <- fluidPage(
@@ -95,7 +99,7 @@ shinyApp(
                   tabPanel("Mapa", 
                            br(),
                            p("Los colores de las estaciones dependen de la disponibilidad de bicicletas que tengan, según los siguientes criterios"),
-                           plotOutput("stationsMap", width = 1000, height = 800),
+                           plotOutput("stationsMap", width = 800, height = 600),
                            br(),
                            p("Información sobre la disponibilidad de bicicletas según las estaciones seleccionadas:"),
                            br(),
@@ -123,7 +127,7 @@ server <- function(input, output) {
     map.unizar <- get_map(location = as.numeric(unizar),
                           color = "color",
                           maptype = "roadmap",
-                          scale = 4,
+                          scale = 2,
                           zoom = 13)
     
     ggmap(map.unizar, legend = "topleft") + geom_point(aes(x = longitud, y = latitud,colour=estado_estacion), alpha = .7,
@@ -159,6 +163,54 @@ server <- function(input, output) {
   options = list(height = 500)
 )
 ```
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

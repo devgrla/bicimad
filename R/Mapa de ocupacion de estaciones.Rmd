@@ -1,0 +1,122 @@
+---
+title: "Mapa de ocupacion de estaciones biciMAD"
+runtime: shiny
+output: html_document
+---
+
+Este documento se consulta la base de datos del mes de noviembre de la EMT sobre el estado de las estaciones por dia y por hora. Se hace de forma interactiva con Shiny, de forma de que se pueda visualizar el mapa de madrid con la ocupación de las estaciones a lo largo del mes.
+
+En la siguiente sección se procede a consultar el archivo, limpiar los datos, cambiar el formato de la fecha, se eliminan columnas y se calcula la ocupación de la estación por hora.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+library(rjson)
+library(dplyr)
+library(plyr)
+library(shiny)
+library(ggmap)
+library(DT)
+
+
+kk <- readLines("https://www.gutrade.io/gaston/Bicimad_Stations_201811.json")
+kk= paste(kk, collapse="")
+tmp <- fromJSON(kk)
+
+total<- c()
+
+for (var in tmp$root[]){
+  id<- var$`_id`
+  stations<- var$stations
+  res <- ldply(var$stations, as.data.frame)
+  res$id <- id
+  total<- rbind(total,res)
+}
+
+head(total)
+
+prueba<-data.frame(total)
+
+#ponemos formato a fecha
+
+prueba$id <- strptime(prueba$id,format='%Y-%m-%dT%H:%M:%S')
+
+#Generamos columna hora
+
+prueba$hora <- format(prueba$id, "%H")
+
+prueba$hora <- as.numeric(prueba$hora)
+
+#Generamos columna fecha
+
+prueba$fecha <- format(prueba$id, "%x")
+
+prueba$fecha <- format(prueba$id, "%d")
+
+prueba$fecha <- as.numeric(prueba$fecha)
+
+#porcentaje de disponibilidad
+
+stations$light <- NULL
+stations$activate <- NULL
+stations$no_available <- NULL
+prueba$ocupacion <- (prueba$dock_bikes/prueba$total_bases)*100
+prueba$latitude <- as.numeric(as.character(prueba$latitude))
+prueba$longitude <- as.numeric(as.character(prueba$longitude))
+
+register_google("AIzaSyCjQ7z4QwZUU7l1U8iBJ6ASX_srvbdZfNk", write = TRUE)
+map <- get_map(location = 'Madrid', zoom = 13, maptype = "terrain")
+
+
+prueba$estado_estacion <- ifelse(prueba$ocupacion<=25,'25% o menos',
+                            ifelse(prueba$ocupacion<=50,'26% - 50%',
+                              ifelse(prueba$ocupacion<75, '51% - 74%',
+                                ifelse(prueba$ocupacion>=75,'75% o más','R'))))   
+
+
+```
+
+
+## Resultado
+
+* **"Mapa"** - Se muestra el mapa la ubicación de las estaciones, diferenciandolas según la disponibilidad que tengan en ese momento. 
+
+Se puede filtrar por dia del mes de noviembre y por horas.
+
+```{r eruptions, echo=FALSE}
+inputPanel(
+  selectInput("dia", label = "Dia:",
+              choices = prueba$fecha, selected = 01),
+  
+  sliderInput("Hora", label = "Hora a analizar:",
+              min = 00, max = 23, value = 09, step = 1
+              )
+  
+)
+    
+renderPlot({
+  
+tmp <- prueba[(prueba$fecha == input$dia)&(prueba$hora==input$Hora),]
+
+    unizar <- geocode('Teatro Amaya, Madrid, EspaÃ±a', 
+                      source = "google")
+    
+    map.unizar <- get_map(location = as.numeric(unizar),
+                          color = "color",
+                          maptype = "roadmap",
+                          scale = 4,
+                          zoom = 13)
+    
+    ggmap(map.unizar, legend = "topleft") + geom_point(aes(x = longitude, y = latitude,colour=estado_estacion), alpha = .7,
+                                   data = tmp,
+                                   size = 6)
+})
+
+```  
+  
+         
+
+
+
+

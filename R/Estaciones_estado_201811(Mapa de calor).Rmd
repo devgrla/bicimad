@@ -4,6 +4,10 @@ runtime: shiny
 output: html_document
 ---
 
+Este documento se consulta la base de datos del mes de noviembre de la EMT sobre el estado de las estaciones por dia y por hora. Se hace de forma interactiva con Shiny, de forma de que se pueda visualizar un mapa de madrid con la ocupación de las estaciones a lo largo del mes.
+
+En la siguiente sección se procede a consultar el archivo, limpiar los datos, cambiar el formato de la fecha, se eliminan columnas y se calcula la ocupación de la estación por hora y se toma el mapa desde google.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -14,7 +18,7 @@ library(shiny)
 library(ggmap)
 library(ggplot2)
 
-kk <- readLines("https://dev.gutrade.io/gaston/Bicimad_Stations_201811.json")
+kk <- readLines("https://www.gutrade.io/gaston/Bicimad_Stations_201811.json", encoding='ISO-8859-1')
 kk= paste(kk, collapse="")
 tmp <- fromJSON(kk)
 
@@ -33,7 +37,6 @@ head(total)
 prueba<-data.frame(total)
 
 #ponemos formato a fecha
-
 prueba$id <- strptime(prueba$id,format='%Y-%m-%dT%H:%M:%S')
 
 #Generamos columna hora
@@ -46,6 +49,8 @@ prueba$fecha <- format(prueba$id, "%x")
 
 prueba$fecha <- format(prueba$id, "%d")
 
+
+
 #porcentaje de disponibilidad
 
 prueba$porcentaje_bicis <- (prueba$dock_bikes/prueba$total_bases)*100
@@ -55,9 +60,15 @@ prueba$longitude <- as.numeric(as.character(prueba$longitude))
 
 register_google("AIzaSyCjQ7z4QwZUU7l1U8iBJ6ASX_srvbdZfNk", write = TRUE)
 map <- get_map(location = 'Madrid', zoom = 13, maptype = "terrain")
+
+
 ```
 
+## Resultado
 
+* **"Mapa"** - Se muestra el mapa de calor de la ocupacion las estaciones de bicicletas de la empresa biciMAD, diferenciandolas según la disponibilidad que tengan en ese momento. 
+
+Se puede filtrar por dia del mes de noviembre y por horas.
 
 ```{r eruptions, echo=FALSE}
 inputPanel(
@@ -70,30 +81,19 @@ inputPanel(
 
 renderPlot({
   
+tmp <- prueba[(prueba$fecha == input$dia)&(prueba$hora==input$Hora),]
 
-biciMAD <- ggmap(map) + geom_point(data=prueba, aes(x=longitude, y=latitude, colour=porcentaje_bicis),
+biciMAD <- ggmap(map) + geom_point(data=tmp, aes(x=longitude, y=latitude, colour=porcentaje_bicis),
                                  alpha = 0.6, show.legend = FALSE, size=4)
- ciudad <- get_map("Madrid, España", zoom=13)
+ ciudad <- get_map("Madrid, Espa?a", zoom=13)
 p      <- ggmap(ciudad)
 p      <- p+stat_density2d(aes(x = longitude, y = latitude, fill=porcentaje_bicis), 
 
-                           data=prueba,geom="polygon", alpha=0.2)
+                           data=tmp,geom="polygon", alpha=0.2)
 p + scale_fill_gradient(low = "yellow", high = "red")
 
 })
 ```
-
-## Embedded Application
-
-It's also possible to embed an entire Shiny application within an R Markdown document using the `shinyAppDir` function. This example embeds a Shiny application located in another directory:
-
-
-
-Note the use of the `height` parameter to determine how much vertical space the embedded application should occupy.
-
-You can also use the `shinyApp` function to define an application inline rather then in an external directory.
-
-In all of R code chunks above the `echo = FALSE` attribute is used. This is to prevent the R code within the chunk from rendering in the document alongside the Shiny components.
 
 
 

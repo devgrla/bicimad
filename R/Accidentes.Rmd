@@ -89,6 +89,7 @@ ac$edad <- gsub("DE ", "",ac$edad)
 ac$edad <- gsub("A [0-9]+ AÑOS", "",ac$edad)
 ac$edad <- gsub("A [0-9][0-9] ANOS", "",ac$edad)
 ac$edad <- gsub(" ", "",ac$edad)
+ac$edad <- as.numeric(ac$edad)
 head(ac)
 ```
 
@@ -98,7 +99,94 @@ y <- ac[ac$n_victimas< 14,]
 
 ```
 
+# Analisis de los datos a través de agrupaciones
+
+## Agrupamos para ver cual es el tipo de accidentes que tiene más victimas.
+
+```{r}
+tmp <- y %>%
+  group_by(tipo_accidente) %>%
+  summarize(n.victimas = sum(n_victimas, na.rm = TRUE,sort=TRUE))
+
+tmp[order(-tmp$n.victimas),]
+
+```
+
+## Agrupamos para ver cual es el tipo de lesividad que más se repite.
+
+```{r}
+y %>%
+  group_by(lesividad) %>%
+  count(sort = TRUE)
+
+
+```
+
+## Agrupamos para ver cual es el distrito donde más accidentes ocurren.
+
+```{r}
+y %>%
+  group_by(distrito) %>%
+  count(sort = TRUE)
+
+
+```
+
+## Agrupamos para ver cual es el dia donde más accidentes ocurren.
+
+```{r}
+y %>%
+  group_by(dia_semana) %>%
+  count(sort = TRUE)
+
+
+```
+## Agrupamos para ver cual es la hora donde más accidentes ocurren.
+
+```{r}
+y %>%
+  group_by(hora) %>%
+  count(sort = TRUE)
+
+
+```
+## Ahora queremos agrupar distritos y dia de semana para ver por distrito cual es el dia de semana donde hay más accidentes.
+
+```{r}
+y %>%
+  group_by(distrito,dia_semana) %>%
+  count()
+
+
+```
+## Ahora queremos ver la edad media de las victimas de accidentes por distrito 
+
+```{r}
+tmp <- y %>%
+  group_by(distrito) %>%
+  summarize(edad = mean(edad, na.rm = TRUE,sort=TRUE))
+
+tmp[order(tmp$distrito),]
+
+```
+
+
 # Visualizacion
+
+## Histograma
+
+* Con este grafico queremos ver la distribución de las edades a lo largo de nuestros datos
+
+```{r}
+hist(y$edad, 
+     main="Histograma de edades", 
+     xlab="edad",
+     ylab="frecuencia",
+     border="blue", 
+     col="green"
+     )
+```
+
 
 ## Graficos de barras
 

@@ -2,7 +2,8 @@ library(rjson)
 library(dplyr)
 library(plyr)
 
-kk <- readLines("dat/Bicimad_Stations_201811.json")
+kk <- readLines("https://dev.gutrade.io/gaston/Bicimad_Stations_201811.json")
+tmp<- fromJSON("https://dev.gutrade.io/gaston/Bicimad_Stations_201811.json")
 kk= paste(kk, collapse="")
 tmp <- fromJSON(kk)
 

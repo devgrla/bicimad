@@ -14,7 +14,7 @@ library(shiny)
 library(ggmap)
 library(ggplot2)
 
-kk <- readLines("dat/Bicimad_Stations_201811.json", encoding='ISO-8859-1')
+kk <- readLines("https://dev.gutrade.io/gaston/Bicimad_Stations_201811.json", encoding='ISO-8859-1')
 kk= paste(kk, collapse="")
 tmp <- fromJSON(kk)
 
@@ -33,7 +33,6 @@ head(total)
 prueba<-data.frame(total)
 
 #ponemos formato a fecha
-
 prueba$id <- strptime(prueba$id,format='%Y-%m-%dT%H:%M:%S')
 
 #Generamos columna hora
@@ -76,14 +75,14 @@ inputPanel(
 
 renderPlot({
   
-
-biciMAD <- ggmap(map) + geom_point(data=prueba, aes(x=longitude, y=latitude, colour=porcentaje_bicis),
+tmp<- prueba[(prueba$fecha == input$dia) & (prueba$hora == input$Hora),]
+biciMAD <- ggmap(map) + geom_point(data=tmp, aes(x=longitude, y=latitude, colour=porcentaje_bicis),
                                  alpha = 0.6, show.legend = FALSE, size=4)
- ciudad <- get_map("Madrid, España", zoom=13)
+ ciudad <- get_map("Madrid, Espa?a", zoom=13)
 p      <- ggmap(ciudad)
 p      <- p+stat_density2d(aes(x = longitude, y = latitude, fill=porcentaje_bicis), 
 
-                           data=prueba,geom="polygon", alpha=0.2)
+                           data=tmp,geom="polygon", alpha=0.2)
 p + scale_fill_gradient(low = "yellow", high = "red")
 
 })

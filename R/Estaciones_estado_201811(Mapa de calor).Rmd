@@ -18,7 +18,7 @@ library(shiny)
 library(ggmap)
 library(ggplot2)
 
-kk <- readLines("http://gutrade.io/gaston/Bicimad_Stations_201811.json", encoding='ISO-8859-1')
+kk <- readLines("https://www.gutrade.io/gaston/Bicimad_Stations_201811.json", encoding='ISO-8859-1')
 kk= paste(kk, collapse="")
 tmp <- fromJSON(kk)
 

@@ -20,7 +20,7 @@ library(ggmap)
 library(DT)
 
 
-kk <- readLines("http://gutrade.io/gaston/Bicimad_Stations_201811.json")
+kk <- readLines("https://www.gutrade.io/gaston/Bicimad_Stations_201811.json")
 kk= paste(kk, collapse="")
 tmp <- fromJSON(kk)
 

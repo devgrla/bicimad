@@ -4,9 +4,9 @@ runtime: shiny
 output: html_document
 ---
 
-Este documento se consulta la base de datos del mes de noviembre de la EMT sobre el estado de las estaciones por dia y por hora. Se hace de forma interactiva con Shiny, de forma de que se pueda visualizar un mapa de madrid con la ocupación de las estaciones a lo largo del mes.
+Este documento se consulta la base de datos del mes de noviembre de la EMT sobre el estado de las estaciones por dia y por hora. Se hace de forma interactiva con Shiny, de forma de que se pueda visualizar un mapa de madrid con la ocupacion de las estaciones a lo largo del mes.
 
-En la siguiente sección se procede a consultar el archivo, limpiar los datos, cambiar el formato de la fecha, se eliminan columnas y se calcula la ocupación de la estación por hora y se toma el mapa desde google.
+En la siguiente seccion se procede a consultar el archivo, limpiar los datos, cambiar el formato de la fecha, se eliminan columnas y se calcula la ocupacion de la estacion por hora y se toma el mapa desde google.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

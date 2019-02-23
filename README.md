@@ -28,4 +28,8 @@ Hay dos archivos. _"Calidad del aire.rmd"_ donde se puede visualizar el código 
 
 * **Estaciones bicimad en tiempo real**. Dentro de la carpeta R, existe una carpeta llamada "estacionesbicimad" que contiene un markdown integrado con una aplicación shiny para mostrar de forma interactiva la disponibilidad de bicicletas y la información de las estaciones en tiempo real, utilizando una API con tal fin.
 
+* **Mapa de ocupacion de estaciones**.  Dentro de la carpeta R, se generó un markdown integrado con una aplicación de shiny para mostrar de forma interactiva la disponibilidad de bicicletas y la información de las estaciones según el dia y la hora que desee el usuario, utilizando para ello un json. (en este markdown, no se pusieron tildes en las palabras ya que fallaba al ejecutarla en otro ordenador, esto era a pesar de ser un cometario.
+
+* **Estaciones_estado_201811(Mapa de calor)**. Dentro de la carpeta R, se generó un markdown integrado con una aplicación de shiny para mostrar de forma interactiva la disponibilidad de bicicletas a través de un mapa de calor. Usa la misma base de datos que el markdown anterior.
+
 ## data

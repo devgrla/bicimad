@@ -32,11 +32,12 @@ Se obtienen los datos del uso del sistema Bicimad, los cuales cuentan con fecha 
 ## R
 
 * **Calidad del aire**. Analiza los datos de la contaminación de Madrid en el periodo 2015-2018. Los datos fueron obtenidos desde el catálogo de datos abiertos.
-Hay dos archivos. _"Calidad del aire.rmd"_ donde se puede visualizar el código y un archivo llamado _"Calidad del aire.html"_ donde ya se visualiza el markdown ejecutado en formato Html. Para visualizar el resultado, se recomienda ir directo al archivo html ya que el markdown tarda un poco en completar de ejecutarse, debido a varios calculos que realiza.
 
-* **Estaciones bicimad en tiempo real**. Dentro de la carpeta R, existe una carpeta llamada "estacionesbicimad" que contiene un markdown integrado con una aplicación shiny ("_estaciones_tiempo_real.Rmd_") para mostrar de forma interactiva la disponibilidad de bicicletas y la información de las estaciones en tiempo real, utilizando una API con tal fin.
+Hay dos archivos. _"Calidad del aire.rmd"_ donde se puede visualizar el código y un archivo llamado _"Calidad del aire.html"_ donde ya se visualiza el markdown ejecutado en formato Html. Para visualizar el resultado, se recomienda ir directo al archivo html ya que el markdown tarda un poco en completar de ejecutarse, debido a varios cálculos que realiza.
 
-* **Mapa de ocupacion de estaciones**.  Dentro de la carpeta R, se generó un markdown integrado con una aplicación de shiny (archivo llamado _Mapa de ocupacion de estaciones.Rmd_ para mostrar de forma interactiva la disponibilidad de bicicletas según el dia y la hora que desee el usuario, utilizando para ello un json. (en este markdown, no se pusieron tildes en las palabras ya que fallaba al ejecutarla en otro ordenador, esto era a pesar de ser un cometario.
+* **Estaciones bicimad en tiempo real**. Dentro de la carpeta R, existe una carpeta llamada "estacionesbicimad" que contiene un markdown integrado con una aplicación shiny ("_estaciones_tiempo_real.Rmd_"). Se muestra de forma interactiva la disponibilidad de bicicletas y la información de las estaciones en tiempo real, utilizando una API con tal fin. (Servicios abiertos Open Data Madrid)
+
+* **Mapa de ocupacion de estaciones**.  Dentro de la carpeta R, se generó un markdown integrado con una aplicación de shiny (archivo llamado _Mapa de ocupacion de estaciones.Rmd_ para mostrar de forma interactiva la disponibilidad de bicicletas según el dia y la hora que desee el usuario (**Datos de noviembre 2018**), utilizando para ello un json. (en este markdown, no se pusieron tildes en las palabras ya que fallaba al ejecutarla en otro ordenador, esto era a pesar de ser un cometario.
 
 * **Estaciones_estado_201811(Mapa de calor)**. Dentro de la carpeta R, se generó un markdown integrado con una aplicación de shiny para mostrar (_Llamado Estaciones_estado_201811(Mapa de calor).Rmd_) de forma interactiva la disponibilidad de bicicletas a través de un mapa de calor. Usa la misma base de datos que el markdown anterior. 
 
@@ -44,5 +45,3 @@ Hay dos archivos. _"Calidad del aire.rmd"_ donde se puede visualizar el código 
 
 * **Accidentes**
 Se obtienen los datos de los accidentes con implicaciones de bicicletas. El archivo fue obtenido desde el catálogo de datos abiertos. Se hace una limpieza de la información y un analisis visual de los datos. Hay dos archivos. _"Accidentes.rmd"_ donde se puede visualizar el código y un archivo llamado _"Accidentes.html"_ donde ya se visualiza el markdown ejecutado en formato Html.
-
-## data

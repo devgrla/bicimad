@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Mapa de Calor"
 runtime: shiny
 output: html_document
 ---
@@ -17,6 +17,7 @@ library(plyr)
 library(shiny)
 library(ggmap)
 library(ggplot2)
+library(leaflet)
 
 kk <- readLines("https://www.gutrade.io/gaston/Bicimad_Stations_201811.json", encoding='ISO-8859-1')
 kk= paste(kk, collapse="")
@@ -49,7 +50,9 @@ prueba$fecha <- format(prueba$id, "%x")
 
 prueba$fecha <- format(prueba$id, "%d")
 
+prueba$hora <- as.numeric(prueba$hora)
 
+prueba$fecha <- as.numeric(prueba$fecha)
 
 #porcentaje de disponibilidad
 
@@ -73,7 +76,7 @@ Se puede filtrar por dia del mes de noviembre y por horas.
 ```{r eruptions, echo=FALSE}
 inputPanel(
   selectInput("dia", label = "Dia:",
-              choices = prueba$fecha, selected = 01),
+              choices = prueba$fecha, selected = 5),
   
   sliderInput("Hora", label = "Hora a analizar:",
               min = 00, max = 23, value = 09, step = 1)
@@ -87,7 +90,7 @@ biciMAD <- ggmap(map) + geom_point(data=tmp, aes(x=longitude, y=latitude, colour
                                  alpha = 0.6, show.legend = FALSE, size=4)
  ciudad <- get_map("Madrid, Espa?a", zoom=13)
 p      <- ggmap(ciudad)
-p      <- p+stat_density2d(aes(x = longitude, y = latitude, fill=porcentaje_bicis), 
+p      <- p+stat_density2d(aes(x = longitude, y = latitude, fill=porcentaje_bicis),
 
                            data=tmp,geom="polygon", alpha=0.2)
 p + scale_fill_gradient(low = "yellow", high = "red")

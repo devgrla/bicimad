@@ -206,17 +206,7 @@ g1 + geom_point(aes(size=abo_anual,color=abo_anual))+
        x='Abonado Anual')
 ```
 
-Aunque son demandas motivadas por necesidades distintas, sí podemos observar que tiene una relación en la medida que el aumento de una coincide con el aumento de la otra, aunque a diferentes escalas como lo hemos visto antes, pero siexiste una tendencia clara entre ellas.
-
-
-
-
-
-Con el siguiente **Balplot** podemos darnos cuenta que el aporte en número de veces por cada usuario es el mismo: Todos los días hubo uso de **abonados anuales** y **abonados ocasionales**
-
-```{r}
-barplot(table(co.biciusosmelt$tipo_usuario))
-```
+Aunque son demandas motivadas por necesidades distintas, sí podemos observar que tiene una relación en la medida que el aumento de una coincide con el aumento de la otra, aunque a diferentes escalas como lo hemos visto antes, pero si existe una tendencia clara entre ellas.
 
 
 Grafica **ggplot** sobre el comportamiento de la demanda por día, por mes por tipo de usuario

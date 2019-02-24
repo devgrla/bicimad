@@ -15,6 +15,7 @@ Se analizan varias fuentes de datos por separado. Se encuentran los siguientes a
 * **Calidad del aire - Madrid** . Analiza los datos de la contaminación de Madrid en el período 2015-2018. Los datos fueron obtenidos desde el catálogo de datos abiertos.
 * **Clima Madrid** .  Se obtienen los datos desde el 2015 a principios de febrero 2019, a través de la Api de la AEMET. Esos datos están descargados en un archivo en la carpeta dat. De todas formas se puede consultar la API para cualquier periodo y utilizar esos datos en el análisis (Está explicado en el notebook). Esta información se cruza luego con los usos de las bicicletas.
 * **Estaciones Bicimad en tiempo real** . Se obtiene la información del estado de las situaciones de Bicimad en tiempo real (mediante API) y se visualiza en mapa cada una diferenciandose según la disponibilidad que tengan en ese momento. Además se aprovecha esa información para guardar en BD las estaciones y su información general.
+
 **Nota** En una computadora al ejecutar la visualización en mapa de este notebook. No supimos identificar por qué pero creemos tiene algo que ver con la versión de folium. El error era el siguiente: "no arguments in initialization list". Por lo que investigamos tenia que ver con el crs definido arriba.
 No supimos solucionarlo, además en otras 3 computadoras todo funcionaba correctamente asi que esperamos funcione bien donde se realize la corrección.
 

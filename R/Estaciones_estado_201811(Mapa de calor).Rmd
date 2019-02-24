@@ -35,31 +35,31 @@ for (var in tmp$root[]){
 
 head(total)
 
-prueba<-data.frame(total)
+base<-data.frame(total)
 
 #ponemos formato a fecha
-prueba$id <- strptime(prueba$id,format='%Y-%m-%dT%H:%M:%S')
+base$id <- strptime(base$id,format='%Y-%m-%dT%H:%M:%S')
 
 #Generamos columna hora
 
-prueba$hora <- format(prueba$id, "%H")
+base$hora <- format(base$id, "%H")
 
 #Generamos columna fecha
 
-prueba$fecha <- format(prueba$id, "%x")
+base$fecha <- format(base$id, "%x")
 
-prueba$fecha <- format(prueba$id, "%d")
+base$fecha <- format(base$id, "%d")
 
-prueba$hora <- as.numeric(prueba$hora)
+base$hora <- as.numeric(base$hora)
 
-prueba$fecha <- as.numeric(prueba$fecha)
+base$fecha <- as.numeric(base$fecha)
 
 #porcentaje de disponibilidad
 
-prueba$porcentaje_bicis <- (prueba$dock_bikes/prueba$total_bases)*100
+base$porcentaje_bicis <- (base$dock_bikes/base$total_bases)*100
 
-prueba$latitude <- as.numeric(as.character(prueba$latitude))
-prueba$longitude <- as.numeric(as.character(prueba$longitude))
+base$latitude <- as.numeric(as.character(base$latitude))
+base$longitude <- as.numeric(as.character(base$longitude))
 
 register_google("AIzaSyCjQ7z4QwZUU7l1U8iBJ6ASX_srvbdZfNk", write = TRUE)
 map <- get_map(location = 'Madrid', zoom = 13, maptype = "terrain")
@@ -76,7 +76,7 @@ Se puede filtrar por dia del mes de noviembre y por horas.
 ```{r eruptions, echo=FALSE}
 inputPanel(
   selectInput("dia", label = "Dia:",
-              choices = prueba$fecha, selected = 5),
+              choices = base$fecha, selected = 5),
   
   sliderInput("Hora", label = "Hora a analizar:",
               min = 00, max = 23, value = 09, step = 1)
@@ -84,7 +84,7 @@ inputPanel(
 
 renderPlot({
   
-tmp <- prueba[(prueba$fecha == input$dia)&(prueba$hora==input$Hora),]
+tmp <- base[(base$fecha == input$dia)&(base$hora==input$Hora),]
 
 biciMAD <- ggmap(map) + geom_point(data=tmp, aes(x=longitude, y=latitude, colour=porcentaje_bicis),
                                  alpha = 0.6, show.legend = FALSE, size=4)

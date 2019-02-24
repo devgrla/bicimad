@@ -16,8 +16,8 @@ Se analizan varias fuentes de datos por separado. Se encuentran los siguientes a
 * **Clima Madrid** .  Se obtienen los datos desde el 2015 a principios de febrero 2019, a través de la Api de la AEMET. Esos datos están descargados en un archivo en la carpeta dat. De todas formas se puede consultar la API para cualquier periodo y utilizar esos datos en el análisis (Está explicado en el notebook).
 * **Estaciones Bicimad en tiempo real** . Se obtiene la información del estado de las situaciones de Bicimad en tiempo real (mediante API) y se visualiza en mapa cada una diferenciandose según la disponibilidad que tengan en ese momento. Además se aprovecha esa información para guardar en BD las estaciones y su información general.
 * **Usos por día** . Se analiza según los datos obtenidos del catalogo abierto de madrid, los usos de las biciletas según distintos criterios, en el periodo 2015- 2018. Se guarda además la información en la base de datos.
-* **Accidentes con implicaciones de bicicleta - Madrid**
-Se obtienen los datos de los accidentes con implicaciones de bicicletas. El archivo fue obtenido desde el catálogo de datos abiertos. Se hace una limpieza de la información y un analisis visual de los datos. Tomamos los archivos del 2016, 2017 y 2018 y los unimos a un archivo maestro. 
+* **Accidentes Bicicletas**
+Se obtienen los datos de los accidentes con implicaciones de bicicletas. El archivo fue obtenido desde el catálogo de datos abiertos. Se hace una limpieza de la información y un analisis visual de los datos. Tomamos los archivos del 2016, 2017 y 2018 y los unimos en un archivo maestro. 
 * **Bicis usos vs clima**
 Se obtienen los datos del uso del sistema Bicimad, los cuales cuentan con fecha por día, tipo de usuario (Abonado anual/Abonado ocasional) y cantidades de uso por tipo de usuario. Adicionalmente se realiza un cruce con la base de datos del clima para identificar posibles relaciones entre la lluvia y la temperatura con el uso de las bicicletas.
 
@@ -32,6 +32,9 @@ Hay dos archivos. _"Calidad del aire.rmd"_ donde se puede visualizar el código 
 
 * **Estaciones_estado_201811(Mapa de calor)**. Dentro de la carpeta R, se generó un markdown integrado con una aplicación de shiny para mostrar (_Llamado Estaciones_estado_201811(Mapa de calor).Rmd_) de forma interactiva la disponibilidad de bicicletas a través de un mapa de calor. Usa la misma base de datos que el markdown anterior. 
 
-* **Informe_uso_bicimad_markdown.Rmd** Dentro de la carpeta R se ingresó un informe sobre el comportamiento de la demanda del sistema de Bicimad en relación a dos tipos de usuarios, los abonados anuales y los abonados ocasionales. Se representa las distribuciones de la demanda por año, por meses y días de la semana. Adicionalmente se cruza con la base de datos del clima para identificar relaciones entre el uso del sistema y la lluvia y la temperatura. 
+* **Informe_uso_bicimad_markdown** Dentro de la carpeta R se ingresó un informe sobre el comportamiento de la demanda del sistema de Bicimad en relación a dos tipos de usuarios, los abonados anuales y los abonados ocasionales. Se representa las distribuciones de la demanda por año, por meses y días de la semana. Adicionalmente se cruza con la base de datos del clima para identificar relaciones entre el uso del sistema y la lluvia y la temperatura. El archivo esta en formato Markdown y html.
+
+* **Accidentes**
+Se obtienen los datos de los accidentes con implicaciones de bicicletas. El archivo fue obtenido desde el catálogo de datos abiertos. Se hace una limpieza de la información y un analisis visual de los datos. Hay dos archivos. _"Accidentes.rmd"_ donde se puede visualizar el código y un archivo llamado _"Accidentes.html"_ donde ya se visualiza el markdown ejecutado en formato Html.
 
 ## data

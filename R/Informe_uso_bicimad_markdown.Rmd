@@ -63,7 +63,7 @@ co.biciusos<- biciusos
 ```
 
 
-Para mejor manejo de las columnas vamos a reasignar nombres que sean mas digeribles para quien procesa los datos y para quien lee el informe.
+Para mejor manejo de las columnas vamos a reasignar nombres que sean mas digeribles para quién procesa los datos y para quién lee el informe.
 
 ```{r}
 colnames(co.biciusos)<- c('fecha','abo_anual', 'abo_ocas','total_abo',
@@ -84,7 +84,7 @@ La columna **'fecha'** se encuentra en formato **'Factor'**, lo que nos dificult
 ```
 
 
-Con el fin de identificar mas observaciones y obtener mas información sobre el comportamiento de los usuarios de Bicimad, vamos a a extraer de la fecha, una columna con el año y otra con el mes
+Con el fin de identificar más observaciones y obtener mas información sobre el comportamiento de los usuarios de Bicimad, vamos a extraer de la fecha, una columna con el año y otra con el mes.
 
 ```{r}
 co.biciusos$ano<- year(co.biciusos$fecha)
@@ -93,13 +93,13 @@ co.biciusos$dia_semana<- wday(co.biciusos$fecha, label=TRUE)
 ```
 
 
-Verificamos nuevamente el estado de la tabla *co.bicisusos* con sus columnas y nombres nuevos
+Verificamos nuevamente el estado de la tabla *co.bicisusos* con sus columnas y nombres nuevos.
 ```{r}
 head(co.biciusos)
 ```
 
 
-Con las columnas nuevas ya determinadas, procedemos a eliminar columnas que no nos aportaban mayor análisis, en este caso columnas con datos acumulados que no me interesan en este momento pero que visualmente sí estorban.
+Con las columnas nuevas ya determinadas, procedemos a eliminar columnas que no nos aportaban mayor análisis, en este caso columnas con datos acumulados que no interesan en este momento pero que visualmente sí molestan.
 
 ```{r}
 co.biciusos$usoanual_acum<-co.biciusos$usoocas_acum<-co.biciusos$usototal_acum<-NULL
@@ -138,7 +138,7 @@ boxplot(co.biciusos$abo_ocas~co.biciusos$ano , xlab = 'Año',
 abline(h = mean(co.biciusos$abo_ocas), col = "red")
 ```
 
-Apreciamos como generando un **boxplot** por usuario nos permite ver las dimensiones o escalas que separan el comportamiento de cada *tipo de usuario*. Los *abonados ocasionales* generan un uso muy por debajo de los lo visto en la *Demanda total*, es decir el aporte de estos usuario no representa menos de un 5%. 
+Apreciamos como generando un **boxplot** por usuario nos permite ver las dimensiones o escalas que separan el comportamiento de cada *tipo de usuario*. Los *abonados ocasionales* generan un uso muy por debajo de los lo visto en la *Demanda total*, es decir el aporte de estos usuarios representa menos de un 5%. 
 
 
 Con el fin de exprimir un poco los datos vamos a aplicar una función **melt** para analizar otra perspectiva de los usos por usuario. Para esto crearemos una segunda tabla llamada **'co.biciusosmelt'**.
@@ -220,7 +220,7 @@ gg1 + facet_wrap(~mes,ncol = 6) +
        x="Cantidad de usos", y="Día de la semana/Mes") 
 ```
 
-En esta gráfica observamos el desempeño de los tipos de usuarios por día de la semana por mes. Es interesante ver como los **abonados ocasionales** aunque a una escala menor, tienden a usar Bicimad los fines de semana, siendo Abril y Septiebre los meses de mayor intensidad. En el caso de los **abonados anuales**, qienes son el mercado objetivo a estudiar, vemos como historicamente junio, septiembre y octubre son los meses con mayor usabilidad del sistema, especialmente los días miércoles, jueves y viernes. Por el contrario, son febrero y marzo los meses con menor demanda, incluso por debajo de la media vista antes de 10.000 usos por día. Además podemos agregar que la demanda de los **abonados anuales** disminuye drásticamente los fines de semana, lo que nos permite deducir su uso con intensiones laborales o de movilidad estudiantil.
+En esta gráfica observamos el desempeño de los tipos de usuarios por día de la semana por mes. Es interesante ver como los **abonados ocasionales** aunque a una escala menor, tienden a usar Bicimad los fines de semana, siendo Abril y Setiembre los meses de mayor intensidad. En el caso de los **abonados anuales**, quienes son el mercado objetivo a estudiar, vemos como históricamente junio, septiembre y octubre son los meses con mayor usabilidad del sistema, especialmente los días miércoles, jueves y viernes. Por el contrario, son febrero y marzo los meses con menor demanda, incluso por debajo de la media vista antes de 10.000 usos por día. Además podemos agregar que la demanda de los **abonados anuales** disminuye drásticamente los fines de semana, lo que nos permite deducir su uso con intensiones laborales o de movilidad estudiantil.
 
 Gráfica **ggplot** de comportamiento mensual por año.
 
@@ -234,7 +234,7 @@ gg2 + facet_wrap(~mes,ncol = 6) +
 
  
 Bicimad inicia labores en junio de 2014, razón por la que se puede observar en esta gráfica como los primeros meses de ese año no hay datos, y luego en el 6to mes aparece un subida abrupta. 
-En esta otra gráfica tipo **ggplot de puntos** podemos observar como la tendencia ha venido a mas cada desde que inició el sistema, aunque en *2016* se presenta una caída en el mes de sepiembre, esto debido a la municipalización del sistema por el *Ayuntamiento de Madrid* quien adquirió en julio pero en agosto inició un plan de reparación total del las estaciones y bicicletas, dejando por fuera casi el 50% de las mismas, afectando su uso drásticamente.Este efecto se presenta en los *dos tipos de usuarios*, sin embargo, por obvias razones los **abonados anuales** que son los que mayor uso le dan al sistema, se vieron mas afectados.
+En esta otra gráfica tipo **ggplot de puntos** podemos observar como la tendencia ha venido a mas cada desde que inició el sistema, aunque en *2016* se presenta una caída en el mes de sepiembre, esto debido a la municipalización del sistema por el *Ayuntamiento de Madrid*, La adquisición se realizó en julio pero recién en agosto inició un plan de reparación total del las estaciones y bicicletas, dejando por fuera casi el 50% de las mismas, afectando su uso drásticamente. Este efecto se presenta en los *dos tipos de usuarios*, sin embargo, por obvias razones los **abonados anuales** que son los que mayor uso le dan al sistema, se vieron más afectados.
 
 
 Con el fin de analizar variables adicionales que pueden afectar la demanda del sistema, vamos a cruzar la tabla de 'co.bicisusos' con una tabla con datos históricos del clima la cual contiene entre otas, la media del clima diario y si hubo precipitaciones o no, desde 2015.
@@ -321,7 +321,7 @@ geom_smooth(method="lm", color='red')+
 gg4
 ```
 
-En las dos anteriores gráficas podemos observar como existe una relación directa entre la temperatura y el uso de las bicicletas. A medida que aumenta la temperatura aumenta el uso del sistema, sin embargo desúés de los 25 gradoas ya se empieza a notar un descenso en la cantidad de usos.
+En las dos anteriores gráficas podemos observar como existe una relación directa entre la temperatura y el uso de las bicicletas. A medida que aumenta la temperatura aumenta el uso del sistema, sin embargo después de los 25 grados ya se empieza a notar un descenso en la cantidad de usos.
 
 Relación entre la lluvia y el uso del sistema por usuarios
 

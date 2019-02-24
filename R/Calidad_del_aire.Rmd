@@ -11,7 +11,7 @@ library(lubridate)
 
 ## Contaminación Madrid - 2018
 
-Queremos trabajar sobre estos datos para ver después como afecta la contaminación (si es que afecta) en el uso de las bicicletas. Para esto necesitamos hacer el trabajo previo de la impieza y transformación de estos datos.
+Queremos trabajar sobre estos datos para ver después como afecta la contaminación (si es que afecta) en el uso de las bicicletas. Para esto necesitamos hacer el trabajo previo de la limpieza y transformación de estos datos. Vamos a tener en cuenta solamente algunas estaciones y algunos contaminantes que se detallan a continuación.
 
 **Los valores que importan son los siguientes:**
    
@@ -36,7 +36,7 @@ En zonas mas alejadas está:
 * El pardo: 58
 * Casa de campo: 24
 
-Los datos están esructurados en un formato ancho, donde cada columna es un día y cada fila corresponde a las observaciones de cada magnitud por mes y estación.
+Los datos están estructurados en un formato ancho, donde cada columna es un día y cada fila corresponde a las observaciones de cada magnitud por mes y estación.
 
 **SOLO SON VALIDOS LOS VALORES QUE TIENEN UNA V**
 
@@ -56,7 +56,7 @@ head(data_total)[1:15] #El resto de las columnas corresponden al resto de los d�
 
 ## Limpieza y transformación de datos.
 
-Empiezo a borrar columnas que ya se no voy a usar y elimino información de magnitudes y estaciones que no son de mi interés-
+Empiezo a borrar columnas que ya se no voy a usar y elimino información de magnitudes y estaciones que no son de mi interés.
 
 ```{r clean, include=FALSE}
 data.copy <- data_total
@@ -80,14 +80,14 @@ data.copy <- data.copy[data.copy$MAGNITUD %in% magnitudes_interes,]
 
 ```
 
-El formato existente no me sirve. Necesito un formato largo para tenes dias y valores como filas. Mi objetivo final es armar una columna que contenga la fecha correspondiente.
+El formato existente no me sirve. Necesito un formato largo para tener dias y valores como filas. Mi objetivo final es armar una columna que contenga la fecha correspondiente.
 
 ``` {r melt, warning=FALSE}
 data.copy <- melt(data.copy, id.vars = c('ESTACION', 'MAGNITUD', 'ANO', 'MES'), na.rm = TRUE)
 head(data.copy)
 ```
 
-Armo una columna nueva con la fecha definiendo una funcion que la genere. Elimino los que quedan con fecha NULL ya que son fechas que no existe y cuyos valores no son válidos.
+Armo una columna nueva con la fecha definiendo una función que la genere. Elimino los que quedan con fecha NULL ya que son fechas que no existe y cuyos valores no son válidos.
 
 ```{r fecha}
 
@@ -102,7 +102,7 @@ data.copy <- data.copy[!is.na(data.copy$fecha),] #Elimino las fechas que no exis
 
 ```
 
-Elimino de la columna variable los numeros, ya que no la voy a usar mas
+Elimino de la columna variable los números, ya que no la voy a usar mas.
 
 ```{r convert}
 convert_to_only_letters <- function(variable){
@@ -117,7 +117,7 @@ data.copy$variable <- as.character(convert_to_only_letters(data.copy$variable))
 
 ## Filtrado solo valores que son válidos y últimas transformaciones
 
-Para cada día (variable D) necesito buscar su equivalente (variable V) según la fecha y verificar que el valor tomado para esa fecha sea válido. (Que no tenga value 'N')
+Para cada día (variable D) necesito buscar su equivalente (variable V) según la fecha y verificar que el valor tomado para esa fecha sea válido. (Que no tenga value 'N').
 
 ``` {r merge}
 
@@ -142,7 +142,7 @@ data.copy$medicion <- as.numeric(data.copy$medicion)
 
 ## Resultado de transformaciones y filtrados.
 
-Cambio códigos de estaciones y magnitudes por sus textos correspondientes para que sean mas claros
+Cambio códigos de estaciones y magnitudes por sus textos correspondientes para que sean mas claros.
 
 ```{r cambiosTexto}
 data.copy[data.copy$estacion == 49,]$estacion <- 'Retiro'

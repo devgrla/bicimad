@@ -15,8 +15,7 @@ library(ggplot2)
 
 
 ```{r}
-setwd("C:/Users/dgste/bicimad/")
-ac_2018 <- read.delim("dat/AccidentesBicicletas_2018.csv", sep = ";", header = TRUE)
+ac_2018 <- read.delim("../dat/AccidentesBicicletas_2018.csv", sep = ";", header = TRUE)
 ``` 
 
 # Limpieza de datos
@@ -27,21 +26,21 @@ Lo primero que hacemos es llevar a cabo una copia con el fin de no sobreescribir
 ac <- ac_2018
 ```
 
-Luego, el siguiente paso es analizar a travÈs del summary, typeof los datos de nuestra tabla. Esto nos dar√°n una imagen m·s avanzada de nuestros datos.
+Luego, el siguiente paso es analizar a trav√©s del summary, typeof los datos de nuestra tabla. Esto nos dar√° una imagen m√°s avanzada de nuestros datos.
 
 ```{r}
 summary(ac)
 typeof(ac)
 ```
 
-Los datos nos muestran que en la tabla, existen una serie de campos que nos dan poca informaciÛn. El equipo ha tomado la decisiÛn de eliminarlos para tener una tabla m·s pequeÒa, que nos ser· ˙til al siguiente paso de renombrar las columnas para llamarlas de una forma mas manejable.
+Los datos nos muestran que en la tabla, existen una serie de campos que nos dan poca informaci√≥n. El equipo ha tomado la decisi√≥n de eliminarlos para tener una tabla m√°s peque√±a, que nos ser√° √∫til al siguiente paso de renombrar las columnas para llamarlas de una forma mas manejable.
 
 ```{r}
 colnames(ac)
 ac[c(8,9,11,13,15:16,19)] <- list(NULL)
 ```
 
-Luego, como comentamos, modificaremos el nombre de los campos para unos sin espacios y en minusculas.
+Luego, como comentamos, modificaremos el nombre de los campos para unos sin espacios y en min√∫sculas.
 
 ```{r}
 colnames(ac) <- c("fecha","hora","dia_semana","distrito","lugar_accidente","Numero_accidente","n_parte","cpfa_lluvia","cpfa_seco","cpsv.mojada","cpsv_grava_suelta","cpsv_hielo","n_victimas","tipo_accidente","tipo_vehiculo","tipo_persona","sexo","lesividad","edad")
@@ -59,49 +58,49 @@ Observamos que los campos que debemos cambiar son los siguientes:
 ```{r} 
 ac$fecha <- as.Date(ac$fecha, "%d/%m/%Y")
 ```
-###agregamos la columna mes y ponemos el mes en cuestion.
+### agregamos la columna mes y ponemos el mes en cuestion.
 ```{r}
 ac$mes <- format(ac$fecha, "%m") 
 ```
-###agregamos la columna dia y ponemos el dia en cuestion.
+### agregamos la columna dia y ponemos el dia en cuestion.
 ```{r}
 ac$dia <- format(ac$fecha, "%d")
 ```
-###vemos como va a tabla
+### vemos como va a tabla
 ```{r}
 tail(ac)
 ```
 
-##Hora
+## Hora
 
-###Quitamos los "DE" y la hora que se encuentra despuÈs de la "A" y vemos el resultado.
+### Quitamos los "DE" y la hora que se encuentra despu√©s de la "A" y vemos el resultado.
 ```{r}
 ac$hora <- gsub("DE ", "",ac$hora)
 ac$hora <- gsub("A [0-9]+:[0-9]+$", "",ac$hora)
 ac$hora <- gsub(" ", "",ac$hora)
 head(ac)
 ```
-##tramo.edad
+## tramo.edad
 
-###Quitamos los "DE" y la hora que se encuentra despuÈs de la "A" y vemos el resultado.
+### Quitamos los "DE" y la hora que se encuentra despu√©s de la "A" y vemos el resultado.
 ```{r}
 ac$edad <- gsub("DE ", "",ac$edad)
-ac$edad <- gsub("A [0-9]+ A—OS", "",ac$edad)
+ac$edad <- gsub("A [0-9]+ A√ëOS", "",ac$edad)
 ac$edad <- gsub("A [0-9][0-9] ANOS", "",ac$edad)
 ac$edad <- gsub(" ", "",ac$edad)
 ac$edad <- as.numeric(ac$edad)
 head(ac)
 ```
 
-###Eliminamos un outlier donde hubo un accidente en un autobus con 13 victimas
+### Eliminamos un outlier donde hubo un accidente en un autobus con 13 victimas
 ```{r}
 y <- ac[ac$n_victimas< 14,]
 
 ```
 
-# Analisis de los datos a travÈs de agrupaciones
+# An√°lisis de los datos a trav√©s de agrupaciones
 
-## Agrupamos para ver cual es el tipo de accidentes que tiene m·s victimas.
+## Agrupamos para ver cual es el tipo de accidentes que tiene m√°s victimas.
 
 ```{r}
 tmp <- y %>%
@@ -112,7 +111,7 @@ tmp[order(-tmp$n.victimas),]
 
 ```
 
-## Agrupamos para ver cual es el tipo de lesividad que m·s se repite.
+## Agrupamos para ver cual es el tipo de lesividad que m√°s se repite.
 
 ```{r}
 y %>%
@@ -122,7 +121,7 @@ y %>%
 
 ```
 
-## Agrupamos para ver cual es el distrito donde m·s accidentes ocurren.
+## Agrupamos para ver cual es el distrito donde m√°s accidentes ocurren.
 
 ```{r}
 y %>%
@@ -132,7 +131,7 @@ y %>%
 
 ```
 
-## Agrupamos para ver cual es el dia donde m·s accidentes ocurren.
+## Agrupamos para ver cual es el dia donde m√°s accidentes ocurren.
 
 ```{r}
 y %>%
@@ -141,7 +140,7 @@ y %>%
 
 
 ```
-## Agrupamos para ver cual es la hora donde m·s accidentes ocurren.
+## Agrupamos para ver cual es la hora donde m√°s accidentes ocurren.
 
 ```{r}
 y %>%
@@ -150,7 +149,7 @@ y %>%
 
 
 ```
-## Ahora queremos agrupar distritos y dia de semana para ver por distrito cual es el dia de semana donde hay m·s accidentes.
+## Ahora queremos agrupar distritos y dia de semana para ver por distrito cual es el d√≠aa de semana donde hay m√°s accidentes.
 
 ```{r}
 y %>%
@@ -159,7 +158,7 @@ y %>%
 
 
 ```
-## Ahora queremos ver la edad media de las victimas de accidentes por distrito 
+## Ahora queremos ver la edad media de las v√≠ctimas de accidentes por distrito 
 
 ```{r}
 tmp <- y %>%
@@ -171,14 +170,14 @@ tmp[order(tmp$distrito),]
 ```
 
 
-# Visualizacion
+# Visualizaci√≥n
 
 ## Histograma
 
-* Con este grafico queremos ver la distribuciÛn de las edades a lo largo de nuestros datos
+* Con este gr√°fico queremos ver la distribuci√≥n de las edades a lo largo de nuestros datos
 
 ```{r}
-hist(y$edad, 
+hist(ac$edad, 
      main="Histograma de edades", 
      xlab="edad",
      ylab="frecuencia",
@@ -190,11 +189,11 @@ hist(y$edad,
 
 ## Graficos de barras
 
-* Este grafico busca analizar las diferencias entre el numero de victimas hombres y mujeres a lo largo del aÒo
+* Este gr√°fico busca analizar las diferencias entre el n√∫mero de victimas hombres y mujeres a lo largo del a√±o
 
 ```{r}
 
-#agrupaciÛn por mes y sexo sumando el numero de victimas
+#agrupaci√≥n por mes y sexo sumando el n√∫mero de victimas
 ac_3 <- y %>%
   group_by(mes, sexo) %>%
   summarize(n.victimas = sum(n_victimas, na.rm = TRUE))
@@ -205,7 +204,7 @@ ggplot(data=ac_3, aes(x=mes, y=n.victimas, fill=sexo)) +
 
 ```
 
-* Este grafico muestra la evolucion de la variable numero de victimas a lo largo del aÒo.
+* Este gr√°fico muestra la evoluci√≥n de la variable n√∫mero de victimas a lo largo del a√±o.
 
 ```{r}
 ac_3 <- y %>%

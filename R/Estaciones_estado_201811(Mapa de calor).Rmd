@@ -69,14 +69,14 @@ map <- get_map(location = 'Madrid', zoom = 13, maptype = "terrain")
 
 ## Resultado
 
-* **"Mapa"** - Se muestra el mapa de calor de la ocupacion las estaciones de bicicletas de la empresa biciMAD, diferenciandolas según la disponibilidad que tengan en ese momento. 
+* **"Mapa"** - Se muestra el mapa de calor de la ocupacion las estaciones de bicicletas de la empresa biciMAD, diferenciandolas seg?n la disponibilidad que tengan en ese momento. 
 
 Se puede filtrar por dia del mes de noviembre y por horas.
 
 ```{r eruptions, echo=FALSE}
 inputPanel(
   selectInput("dia", label = "Dia:",
-              choices = base$fecha, selected = 5),
+              choices = base$fecha, selected = "05"),
   
   sliderInput("Hora", label = "Hora a analizar:",
               min = 00, max = 23, value = 09, step = 1)
@@ -88,12 +88,12 @@ tmp <- base[(base$fecha == input$dia)&(base$hora==input$Hora),]
 
 biciMAD <- ggmap(map) + geom_point(data=tmp, aes(x=longitude, y=latitude, colour=porcentaje_bicis),
                                  alpha = 0.6, show.legend = FALSE, size=4)
- ciudad <- get_map("Madrid, Espa?a", zoom=13)
+ ciudad <- get_map("Madrid, EspaÃ±a", zoom=13)
 p      <- ggmap(ciudad)
 p      <- p+stat_density2d(aes(x = longitude, y = latitude, fill=porcentaje_bicis),
 
-                           data=tmp,geom="polygon", alpha=0.2)
-p + scale_fill_gradient(low = "yellow", high = "red")
+                           data=tmp,geom="polygon", alpha=0.2) 
+p + scale_fill_gradient(low = "yellow", high = "red") 
 
 })
 ```

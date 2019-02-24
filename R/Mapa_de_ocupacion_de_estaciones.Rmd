@@ -4,7 +4,7 @@ runtime: shiny
 output: html_document
 ---
 
-Este documento se consulta la base de datos del mes de noviembre de la EMT sobre el estado de las estaciones por dia y por hora. Se hace de forma interactiva con Shiny, de forma de que se pueda visualizar el mapa de madrid con la ocupacion de las estaciones a lo largo del mes.
+Este documento se consulta la base de datos del mes de noviembre de 2018 de la EMT sobre el estado de las estaciones por dia y por hora. Se hace de forma interactiva con Shiny, de forma de que se pueda visualizar el mapa de madrid con la ocupacion de las estaciones a lo largo del mes.
 
 En la siguiente seccion se procede a consultar el archivo, limpiar los datos, cambiar el formato de la fecha, se eliminan columnas y se calcula la ocupacion de la estacion por hora.
 
@@ -81,14 +81,14 @@ base$estado_estacion <- ifelse(base$ocupacion<=25,'25% o menos',
 ## Resultado
 
 
-* **"Mapa"** - Se muestra el mapa la ubicacion de las estaciones, diferenciandolas segun la disponibilidad que tengan en ese momento. 
+* **"Mapa"** - Se muestra el mapa la ubicacion de las estaciones, diferenciándolas según la disponibilidad que tengan en ese momento. 
 
-Se puede filtrar por dia del mes de noviembre y por horas.
+Se puede filtrar por día del mes de noviembre y por horas.
 
 ```{r eruptions, echo=FALSE}
 inputPanel(
   selectInput("dia", label = "Dia:",
-              choices = base$fecha, selected = 05),
+              choices = base$fecha, selected = "05"),
   
   sliderInput("Hora", label = "Hora a analizar:",
               min = 00, max = 23, value = 09, step = 1)
@@ -111,7 +111,12 @@ tmp <- base[(base$fecha == input$dia)&(base$hora==input$Hora),]
     
     ggmap(map.unizar, legend = "topleft") + geom_point(aes(x = longitude, y = latitude,colour=estado_estacion), alpha = .7,
                                    data = tmp,
-                                   size = 6)
+                                   size = 6) +  theme(legend.position = "top",
+                                                      legend.title = element_blank(),
+                                                      legend.text = element_text(size = 14),
+                                                      legend.spacing.x = unit(0.5, "lines"),
+                                                      legend.key = element_rect(colour = "transparent", fill = alpha("red", 0))) + 
+                                              scale_color_manual(values=c('#ab0000','#ff6600','#3333ff','#009933')) 
 })
 
 ```  

@@ -36,43 +36,43 @@ for (var in tmp$root[]){
 
 head(total)
 
-prueba<-data.frame(total)
+base<-data.frame(total)
 
 #ponemos formato a fecha
 
-prueba$id <- strptime(prueba$id,format='%Y-%m-%dT%H:%M:%S')
+base$id <- strptime(base$id,format='%Y-%m-%dT%H:%M:%S')
 
 #Generamos columna hora
 
-prueba$hora <- format(prueba$id, "%H")
+base$hora <- format(base$id, "%H")
 
-prueba$hora <- as.numeric(prueba$hora)
+base$hora <- as.numeric(base$hora)
 
 #Generamos columna fecha
 
-prueba$fecha <- format(prueba$id, "%x")
+base$fecha <- format(base$id, "%x")
 
-prueba$fecha <- format(prueba$id, "%d")
+base$fecha <- format(base$id, "%d")
 
-prueba$fecha <- as.numeric(prueba$fecha)
+base$fecha <- as.numeric(base$fecha)
 
 #porcentaje de disponibilidad
 
 stations$light <- NULL
 stations$activate <- NULL
 stations$no_available <- NULL
-prueba$ocupacion <- (prueba$dock_bikes/prueba$total_bases)*100
-prueba$latitude <- as.numeric(as.character(prueba$latitude))
-prueba$longitude <- as.numeric(as.character(prueba$longitude))
+base$ocupacion <- (base$dock_bikes/base$total_bases)*100
+base$latitude <- as.numeric(as.character(base$latitude))
+base$longitude <- as.numeric(as.character(base$longitude))
 
 register_google("AIzaSyCjQ7z4QwZUU7l1U8iBJ6ASX_srvbdZfNk", write = TRUE)
 map <- get_map(location = 'Madrid', zoom = 13, maptype = "terrain")
 
 
-prueba$estado_estacion <- ifelse(prueba$ocupacion<=25,'25% o menos',
-                            ifelse(prueba$ocupacion<=50,'26% - 50%',
-                              ifelse(prueba$ocupacion<75, '51% - 74%',
-                                ifelse(prueba$ocupacion>=75,'75% o más','R'))))   
+base$estado_estacion <- ifelse(base$ocupacion<=25,'25% o menos',
+                            ifelse(base$ocupacion<=50,'26% - 50%',
+                              ifelse(base$ocupacion<75, '51% - 74%',
+                                ifelse(base$ocupacion>=75,'75% o más','R'))))   
 
 
 ```
@@ -87,7 +87,7 @@ Se puede filtrar por dia del mes de noviembre y por horas.
 ```{r eruptions, echo=FALSE}
 inputPanel(
   selectInput("dia", label = "Dia:",
-              choices = prueba$fecha, selected = 5),
+              choices = base$fecha, selected = 5),
   
   sliderInput("Hora", label = "Hora a analizar:",
               min = 00, max = 23, value = 09, step = 1)
@@ -97,7 +97,7 @@ inputPanel(
     
 renderPlot({
   
-tmp <- prueba[(prueba$fecha == input$dia)&(prueba$hora==input$Hora),]
+tmp <- base[(base$fecha == input$dia)&(base$hora==input$Hora),]
 
     unizar <- geocode('Teatro Amaya, Madrid, EspaÃ±a', 
                       source = "google")

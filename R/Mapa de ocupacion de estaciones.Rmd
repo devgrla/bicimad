@@ -88,7 +88,7 @@ Se puede filtrar por dia del mes de noviembre y por horas.
 ```{r eruptions, echo=FALSE}
 inputPanel(
   selectInput("dia", label = "Dia:",
-              choices = base$fecha, selected = 5),
+              choices = base$fecha, selected = 05),
   
   sliderInput("Hora", label = "Hora a analizar:",
               min = 00, max = 23, value = 09, step = 1)

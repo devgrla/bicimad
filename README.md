@@ -32,4 +32,6 @@ Hay dos archivos. _"Calidad del aire.rmd"_ donde se puede visualizar el código 
 
 * **Estaciones_estado_201811(Mapa de calor)**. Dentro de la carpeta R, se generó un markdown integrado con una aplicación de shiny para mostrar (_Llamado Estaciones_estado_201811(Mapa de calor).Rmd_) de forma interactiva la disponibilidad de bicicletas a través de un mapa de calor. Usa la misma base de datos que el markdown anterior. 
 
+* **Informe_uso_bicimad_markdown.Rmd** Dentro de la carpeta R se ingresó un informe sobre el comportamiento de la demanda del sistema de Bicimad en relación a dos tipos de usuarios, los abonados anuales y los abonados ocasionales. Se representa las distribuciones de la demanda por año, por meses y días de la semana. Adicionalmente se cruza con la base de datos del clima para identificar relaciones entre el uso del sistema y la lluvia y la temperatura. 
+
 ## data

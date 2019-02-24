@@ -72,7 +72,7 @@ map <- get_map(location = 'Madrid', zoom = 13, maptype = "terrain")
 prueba$estado_estacion <- ifelse(prueba$ocupacion<=25,'25% o menos',
                             ifelse(prueba$ocupacion<=50,'26% - 50%',
                               ifelse(prueba$ocupacion<75, '51% - 74%',
-                                ifelse(prueba$ocupacion>=75,'75% o más','R'))))   
+                                ifelse(prueba$ocupacion>=75,'75% o m?s','R'))))   
 
 
 ```
@@ -80,7 +80,11 @@ prueba$estado_estacion <- ifelse(prueba$ocupacion<=25,'25% o menos',
 
 ## Resultado
 
+<<<<<<< HEAD
+* **"Mapa"** - Se muestra el mapa la ubicaci?n de las estaciones, diferenciandolas seg?n la disponibilidad que tengan en ese momento. 
+=======
 * **"Mapa"** - Se muestra el mapa la ubicacion de las estaciones, diferenciandolas segun la disponibilidad que tengan en ese momento. 
+>>>>>>> e5ea0fff4d44045a56b275dcb7177a2a756982f8
 
 Se puede filtrar por dia del mes de noviembre y por horas.
 

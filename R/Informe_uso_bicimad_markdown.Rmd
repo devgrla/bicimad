@@ -1,0 +1,350 @@
+---
+title: "Informe Uso del sistema Bicimad 2014-2018"
+
+output: html_document
+---
+## Introducción
+
+La base de datos a trabajar corresponde a la información descargada via API de la página web del Datos abierto de Madrid: https://datos.madrid.es. El archivo contiene información en en formato **.csv** y registra la cantidad de veces por día que los **usuarios abonados anualmente y ocasionalmente** le dieron uso al sistema desde junio de 2014 hasta diciembre de 2018.
+
+
+### Librerías a utilizar
+
+Antes que nada procedemos a instalar las librerías que sabemos serán necesarias, en este caso
+
+* library(lubridate) 
+* library(ggplot2)
+* library(reshape2)
+
+Son herramientas que en su orden nos ayudarán a ajustar datos con formato de fecha, a generar gráficas y a realizar modificaciones en las tablas y o datos.
+```{r}
+library(lubridate)
+library(ggplot2)
+library(reshape2)
+
+```
+
+
+### Inspección de los datos
+Con la primera inspeción entendemos que estamos tratando un dataframe de 8 columnas y 1653 observaciones. Además identificamos el tipo de dato: *integers* para las columnas númericas y *factor* para la columna fecha.
+```{r}
+biciusos <- read.table("../dat/bicis_usos_acumulado por dia.csv",sep=";",header = TRUE)
+```
+
+```{r}
+ dim(biciusos)
+```
+
+
+```{r}
+rbind(head(biciusos),tail(biciusos))
+```
+
+```{r}
+summary(biciusos)
+```
+
+```{r}
+ str(biciusos)
+```
+
+
+Teniendo en cuenta la información obtenida procedemos a eliminar la columna *'X'* que a simple vista contiene datos *'NA'* y sabemos que no aportará nada a nuestro tratamiento. 
+
+```{r}
+biciusos$X<-NULL
+```
+
+
+Además vamos a generar una copia del fichero *(co.biciusos)* para trabajarlo libremente y realizar las modificaciones necesarias.
+
+```{r}
+co.biciusos<- biciusos
+```
+
+
+Para mejor manejo de las columnas vamos a reasignar nombres que sean mas digeribles para quien procesa los datos y para quien lee el informe.
+
+```{r}
+colnames(co.biciusos)<- c('fecha','abo_anual', 'abo_ocas','total_abo',
+                         'usoanual_acum','usoocas_acum', 'usototal_acum')
+```
+
+
+Confirmamos la reasignación de nombres
+
+```{r}
+colnames(co.biciusos)
+```
+
+
+La columna **'fecha'** se encuentra en formato **'Factor'**, lo que nos dificulta su tratamiento, para esto vamos a generar una conversión a formato **'caracter'** y luego a **'date'**. 
+```{r}
+ co.biciusos$fecha<-as.Date(as.character(dmy(co.biciusos$fecha)))
+```
+
+
+Con el fin de identificar mas observaciones y obtener mas información sobre el comportamiento de los usuarios de Bicimad, vamos a a extraer de la fecha, una columna con el año y otra con el mes
+
+```{r}
+co.biciusos$ano<- year(co.biciusos$fecha)
+co.biciusos$mes<- month(co.biciusos$fecha, label = TRUE)
+co.biciusos$dia_semana<- wday(co.biciusos$fecha, label=TRUE)
+```
+
+
+Verificamos nuevamente el estado de la tabla *co.bicisusos* con sus columnas y nombres nuevos
+```{r}
+head(co.biciusos)
+```
+
+
+Con las columnas nuevas ya determinadas, procedemos a eliminar columnas que no nos aportaban mayor análisis, en este caso columnas con datos acumulados que no me interesan en este momento pero que visualmente sí estorban.
+
+```{r}
+co.biciusos$usoanual_acum<-co.biciusos$usoocas_acum<-co.biciusos$usototal_acum<-NULL
+```
+
+
+
+### GENERACIÓN Y ANÁLISIS DE GRÁFICAS
+
+
+Consultamos nuevamente los datos para mayor claridad en la elaboración de las gráficas
+
+```{r}
+rbind(head(co.biciusos),tail(co.biciusos))
+```
+
+
+Con una gráfica **Boxplot** vamos a ver la *distribución de la demanda total por año*. Es decir, la demanda de los *dos tipos de usuarios*. Esto nos permite ver en términos generales como ha sido el comportamiento del sistema a lo largo de los 5 años (2014-2018).
+
+```{r}
+boxplot(co.biciusos$total_abo~co.biciusos$ano , xlab = 'Año', 
+        ylab = 'Cantidad Usos', col = c(123,124,125,126,127), main='Distribución de la demanda total por año',
+        ylim=c(500,18000) )
+abline(h = mean(co.biciusos$total_abo), col = "red")
+```
+
+Esta gráfica nos permite ver como los máximos de usos (a excepción de 2016) han venido aumentando a través de los años. La media a crecido, y cada vez se viene concentrando la demanda en un rango superior a los 10.000 usos por año. 
+
+
+También aplicamos la misma técnica **Boxplot** para la distribución de la demanda ocasionada por el *Usuario de Abono ocasional*.
+
+```{r}
+boxplot(co.biciusos$abo_ocas~co.biciusos$ano , xlab = 'Año', 
+        ylab = 'Cantidad Usos', col = c(100,107,110,120,130), main='Distribución de la demanda Usuario Ocasional por año',
+        ylim=c(0,800) )
+abline(h = mean(co.biciusos$abo_ocas), col = "red")
+```
+
+Apreciamos como generando un **boxplot** por usuario nos permite ver las dimensiones o escalas que separan el comportamiento de cada *tipo de usuario*. Los *abonados ocasionales* generan un uso muy por debajo de los lo visto en la *Demanda total*, es decir el aporte de estos usuario no representa menos de un 5%. 
+
+
+Con el fin de exprimir un poco los datos vamos a aplicar una función **melt** para analizar otra perspectiva de los usos por usuario. Para esto crearemos una segunda tabla llamada **'co.biciusosmelt'**.
+
+```{r}
+head(co.biciusosmelt<-melt(co.biciusos,id.vars = c('fecha','total_abo','ano',
+  'mes','dia_semana' )))
+```
+
+
+Reasignamos nombre a la nueva columna generada por la función **Melt**.
+
+```{r}
+names(co.biciusosmelt)[6]<-'tipo_usuario'
+```
+
+
+La anterior conclusión lo podemos obvervar mas claramente en la siguiente tabla **tmp1**
+```{r}
+tmp1<-data.frame( rbind(tapply(co.biciusosmelt$value,co.biciusosmelt$tipo_usuario, sum)))
+tmp1$total_usos<-tmp1$abo_ocas+tmp1$abo_anual
+tmp1$peso_abo_ocas<-tmp1$abo_ocas/tmp1$total*100
+tmp1$peso_abo_anual<-tmp1$abo_anual/tmp1$total*100
+head(tmp1)
+```
+
+
+Para tener otra visión de la distribución analicemos cada *tipo de usuario* a lo largo de los años:
+
+```{r}
+hist(co.biciusos$abo_anual, main = "Distribución de la demanda Abonados Anuales 2014-2018",
+     xlab = "Cantidad de Uso", ylab = "Frecuencia de Uso",
+     col = "violetred1")
+```
+
+Observamos en este histograma una distribución normal con picos entre los 5.000 y 10.000 usos por mas de 150 veces.
+
+```{r}
+hist(co.biciusos$abo_ocas, main = "Distribución de la demanda Abonados Ocasionales",
+     xlab = "Cantidad de Uso", ylab = "Frecuencia de Uso",
+     col = "chartreuse")
+```
+
+En este otro histograma en cambio la frecuencia es totalmente inferior, con un gran pico de 50 usos en unas 350 ocasiones y luego una media de 150 usos en unas 150 ocasiones aproximadamente.
+
+
+Otra forma de visualizar la diferencia en las escalas de los *usos por usuario* pero con las funciones **apply** y **melt** aplicada (Ya hablaremos de melt en siguiente paso). 
+
+```{r}
+tmp<-tapply(co.biciusosmelt$value,co.biciusosmelt$tipo_usuario, mean)
+tmp
+barplot(tmp, main = "Media de uso por tipo de Usuario",
+        ylab = "Media de Uso (veces)", xlab = "Tipo de usuario",
+        col = "darkgoldenrod1")
+```
+
+
+Con la siguiente gráfica para poder ver la relación entre la demanda de **abonados anuales** y **abonados ocasionales**. 
+
+```{r}
+plot(co.biciusos$abo_anual,co.biciusos$abo_ocas)
+g1 <- ggplot(co.biciusos, aes(x=abo_anual, y=abo_ocas))
+g1 + geom_point(aes(size=abo_anual,color=abo_anual))+
+  labs(title = 'Relación entre demande de usuario anual y ocasional', y='Abonado ocasional',
+       x='Abonado Anual')
+```
+
+Aunque son demandas motivadas por necesidades distintas, sí podemos observar que tiene una relación en la medida que el aumento de una coincide con el aumento de la otra, aunque a diferentes escalas como lo hemos visto antes, pero siexiste una tendencia clara entre ellas.
+
+
+
+
+
+Con el siguiente **Balplot** podemos darnos cuenta que el aporte en número de veces por cada usuario es el mismo: Todos los días hubo uso de **abonados anuales** y **abonados ocasionales**
+
+```{r}
+barplot(table(co.biciusosmelt$tipo_usuario))
+```
+
+
+Grafica **ggplot** sobre el comportamiento de la demanda por día, por mes por tipo de usuario
+
+```{r}
+gg1<-ggplot(co.biciusosmelt )+
+  geom_point(aes(x=dia_semana, y= value, color= tipo_usuario))+
+  geom_smooth(aes(x=dia_semana, y= value))
+gg1 + facet_wrap(~mes,ncol = 6) +
+  labs(title="Comportamiento de la demanda 2014-2018", 
+       x="Cantidad de usos", y="Día de la semana/Mes") 
+```
+
+En esta gráfica observamos el desempeño de los tipos de usuarios por día de la semana por mes. Es interesante ver como los **abonados ocasionales** aunque a una escala menor, tienden a usar Bicimad los fines de semana, siendo Abril y Septiebre los meses de mayor intensidad. En el caso de los **abonados anuales**, qienes son el mercado objetivo a estudiar, vemos como historicamente junio, septiembre y octubre son los meses con mayor usabilidad del sistema, especialmente los días miércoles, jueves y viernes. Por el contrario, son febrero y marzo los meses con menor demanda, incluso por debajo de la media vista antes de 10.000 usos por día. Además podemos agregar que la demanda de los **abonados anuales** disminuye drásticamente los fines de semana, lo que nos permite deducir su uso con intensiones laborales o de movilidad estudiantil.
+
+Gráfica **ggplot** de comportamiento mensual por año.
+
+```{r}
+gg2<-ggplot(co.biciusosmelt )+
+  geom_point(aes(x=ano, y= value, color= tipo_usuario))
+gg2 + facet_wrap(~mes,ncol = 6) +
+  labs(title="Comportamiento de la demanda por usuario Anual 2014-2018", 
+       x="Año", y="Cantidad de usos")
+```
+
+ 
+Bicimad inicia labores en junio de 2014, razón por la que se puede observar en esta gráfica como los primeros meses de ese año no hay datos, y luego en el 6to mes aparece un subida abrupta. 
+En esta otra gráfica tipo **ggplot de puntos** podemos observar como la tendencia ha venido a mas cada desde que inició el sistema, aunque en *2016* se presenta una caída en el mes de sepiembre, esto debido a la municipalización del sistema por el *Ayuntamiento de Madrid* quien adquirió en julio pero en agosto inició un plan de reparación total del las estaciones y bicicletas, dejando por fuera casi el 50% de las mismas, afectando su uso drásticamente.Este efecto se presenta en los *dos tipos de usuarios*, sin embargo, por obvias razones los **abonados anuales** que son los que mayor uso le dan al sistema, se vieron mas afectados.
+
+
+Con el fin de analizar variables adicionales que pueden afectar la demanda del sistema, vamos a cruzar la tabla de 'co.bicisusos' con una tabla con datos históricos del clima la cual contiene entre otas, la media del clima diario y si hubo precipitaciones o no, desde 2015.
+
+Realizamos la importación de los datos los cuales están en formato .csv
+
+```{r}
+clima <- read.table("../dat/all_weather_data.csv",sep=",",header = TRUE)
+```
+
+Procedemos a la inspección de rutina de los datos
+
+```{r}
+dim(clima)
+
+rbind(head(clima),tail(clima))
+
+summary(clima)
+
+str(clima)
+```
+
+
+Como primera medida vamos a eliminar las columnas que no necesitamos y verificamos luego con Head()
+
+```{r}
+clima$X<-clima$hour_temp_max<-clima$hour_temp_min<-clima$temp_max<-clima$temp_min<-NULL
+clima$wind_speed<-clima$wind_speed_max<-NULL
+head(clima)
+```
+
+
+La idea es cruzar los datos de usos con la lluvia, columna 'precipitation' y la temperatura
+media, columna 'temp_media, así podremos ver si existe relación entre estas dos variable y el
+uso del sistema. Para esto vamos a convertir la clase de dato de la columna 'fecha' la cual 
+viene en formato 'factor' a 'Date'.
+
+```{r}
+clima$date<-as.Date(as.character(clima$date, 'y%/m%/%d'))
+
+str(clima)
+```
+
+
+El cruce de las dos trablas las haremos con la función MERGE. Crearemos una tabla nueva
+llamada 'usoclima' .En este caso son tablas donde la columna con la fecha tiene distintos 
+nombres, además en la tabla 'clima' solo aparece información desde 2015, motivo por el cual 
+especificaremos en la sentencia las columnas por el cual se hace el cruce, y desecharemos 
+las fechas antes de 2015 en la tabla de 'Usos'.
+
+```{r}
+usoclima<- merge(co.biciusos, clima, by.x = 'fecha', by.y = 'date')
+usoclima2<- merge(co.biciusosmelt, clima, by.x = 'fecha', by.y = 'date')
+```
+
+
+Corroboramos la nueva tabla 'usoclima'
+
+```{r}
+head(usoclima)
+head(usoclima2)
+```
+
+
+Ahora analicemos con una gráfica de puntos la relación del **Uso abonados anuales** con la **temperatura**
+
+```{r}
+gg3<-ggplot(usoclima, aes(x=temp_media, y=abo_anual, color=temp_media))+
+  geom_point()+ scale_color_distiller("Temperatura", palette = "Spectral")+
+  geom_smooth(method="lm", color='red')+
+  labs(title="Uso abonados anuales vs temperatura 2014-2018", 
+       x="Temperatura Media", y="Cantidad Usos")
+gg3
+```
+
+Relación del uso en abonados ocasionales con la temperatura
+
+```{r}
+gg4<-ggplot(usoclima, aes(x=temp_media, y=abo_ocas,color=temp_media))+
+  geom_point()+scale_color_distiller("Temperatura", palette = "Spectral")+
+geom_smooth(method="lm", color='red')+
+  labs(title="Uso abonados ocasionales vs Temperatura 2014-2018", 
+       x="Temperatura Media", y="Cantidad Usos")
+gg4
+```
+
+En las dos anteriores gráficas podemos observar como existe una relación directa entre la temperatura y el uso de las bicicletas. A medida que aumenta la temperatura aumenta el uso del sistema, sin embargo desúés de los 25 gradoas ya se empieza a notar un descenso en la cantidad de usos.
+
+Relación entre la lluvia y el uso del sistema por usuarios
+
+```{r}
+gg5<-ggplot(usoclima2, aes(x=precipitation, y=value, color=tipo_usuario))+
+  geom_point()+geom_smooth(method="lm", color= 'purple4')+
+  labs(title="Uso del sistema vs Lluvia 2014-2018", 
+       x="Precipitación", y="Cantidad de usos")
+gg5
+```
+
+Cuando llueve el sistema se usa pero en una mejor cantidad, evidentemente la mayor concentración de uso del sistema se da cuando las precipitaciones son cero (0). 
+
+
+
+

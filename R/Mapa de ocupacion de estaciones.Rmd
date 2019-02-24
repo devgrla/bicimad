@@ -68,17 +68,18 @@ base$longitude <- as.numeric(as.character(base$longitude))
 register_google("AIzaSyCjQ7z4QwZUU7l1U8iBJ6ASX_srvbdZfNk", write = TRUE)
 map <- get_map(location = 'Madrid', zoom = 13, maptype = "terrain")
 
-
 base$estado_estacion <- ifelse(base$ocupacion<=25,'25% o menos',
                             ifelse(base$ocupacion<=50,'26% - 50%',
                               ifelse(base$ocupacion<75, '51% - 74%',
-                                ifelse(base$ocupacion>=75,'75% o más','R'))))   
+                                ifelse(base$ocupacion>=75,'75% o mas','R'))))   
+
 
 
 ```
 
 
 ## Resultado
+
 
 * **"Mapa"** - Se muestra el mapa la ubicacion de las estaciones, diferenciandolas segun la disponibilidad que tengan en ese momento. 
 

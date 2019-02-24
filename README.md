@@ -1,6 +1,13 @@
 # BiciMAD
 Proyecto para visualización de datos de bicimad.
 
+Integrantes:
+* Alejandro Galvis
+* Daniel Guerrero
+* Gastón Legnani
+* Jaime Galindo
+* Roberto Barrios
+
 Aprovechamos la ocasión, para insertar los datos limpios y tranformados en la base de datos que nos obligan armar para el TFM. Por eso puede que en algun archivo exista código con tal fin. En la mayoría de los casos, está comentado para que no vuelva a ejecutarse. Por ese motivo si se ejecuta puede que de error, ya que la conexión a la base de datos es incorrecta.
 
 Hay 3 carpetas dentro del repositorio.

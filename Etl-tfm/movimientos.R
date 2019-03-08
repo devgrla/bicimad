@@ -4,9 +4,10 @@ library(plyr)
 library(datetime)
 
 
-kk <- readLines("parte3.json")
+kk <- readLines("parte4.json")
 kk= paste(kk, collapse="")
 tmp <- fromJSON(kk)
+
 rm(kk)
 
 
@@ -25,7 +26,7 @@ f<- function(var) {
   
   write.table(data.frame(oid, user_day_code, idplug_base, user_type_code, idunplug_base, 
                          travel_time, idunplug_station, age_range_code, idplug_station, 
-                         unplug_hourtime, zip_code), 'movimientos_octubre3.csv'  , append= T, sep=';', col.names=FALSE )
+                         unplug_hourtime, zip_code), 'movimientos_octubre2018.csv'  , append= T, sep=';', col.names=FALSE )
 }
 
 

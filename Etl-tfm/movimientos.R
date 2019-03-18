@@ -4,7 +4,7 @@ library(plyr)
 library(datetime)
 
 
-kk <- readLines("parte4.json")
+kk <- readLines("C:/Users/Xseed/Google Drive/EAE/TFM - Datos y documentos/Datos y descripción/Datos/BiciMad/Movimientos Sin procesar/xaa.json")
 kk= paste(kk, collapse="")
 tmp <- fromJSON(kk)
 
@@ -26,9 +26,16 @@ f<- function(var) {
   
   write.table(data.frame(oid, user_day_code, idplug_base, user_type_code, idunplug_base, 
                          travel_time, idunplug_station, age_range_code, idplug_station, 
-                         unplug_hourtime, zip_code), 'movimientos_octubre2018.csv'  , append= T, sep=';', col.names=FALSE )
+                         unplug_hourtime, zip_code), 'movimientos_enero2019.csv'  , append= T, sep=';', col.names=FALSE )
 }
 
+
+
+kk <- readLines("C:/Users/Xseed/Google Drive/EAE/TFM - Datos y documentos/Datos y descripción/Datos/BiciMad/Movimientos Sin procesar/xac.json")
+kk= paste(kk, collapse="")
+tmp <- fromJSON(kk)
+
+rm(kk)
 
 lapply(tmp$root[], f)
 

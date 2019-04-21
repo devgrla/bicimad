@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw
 import geopandas as gpd
 import psycopg2
 conn = psycopg2.connect("host='postgre-sqltest.cpdeokpzufj1.us-west-2.rds.amazonaws.com' port=5432 dbname='postgres' user=xseed password=LosTilos114")
+import funciones_fechas as ff
 
 def get_data_for_trip_counts(date_from, date_to, user_type):
     query = '''
@@ -26,9 +27,14 @@ def get_data_for_trip_counts(date_from, date_to, user_type):
 
     query = query.format(date_from, date_to, user_type)
     data = pd.read_sql(query, conn)
+    #Calcular hora de enganche de la bicicleta en base al unplug hour time y el travel time
+    data['plug_hourtime'] = pd.to_datetime(data.unplug_hourtime) + pd.to_timedelta(data.travel_time, unit='s')
+    data["hour"] = data.unplug_hourtime.map(lambda x: x.hour)
+    data["hour_arrival"] = data.plug_hourtime.map(lambda x: x.hour)
+    data["day_week"] = data.plug_hourtime.apply(ff.get_day_of_week)
     return data
 
-def get_trip_counts_by_hour(selected_hour, data):
+def get_trip_counts_by_hour(selected_hour_from, selected_hour_to, data, weekends = 0):
 
     locations = data.groupby("code_station_departure").first()
     # and select only the tree columns we are interested in
@@ -37,8 +43,13 @@ def get_trip_counts_by_hour(selected_hour, data):
                               "name_departure",
                               "distrito_departure"]]
     
-    subset = data[data["hour"]==selected_hour]
-    subset_arrival = data[data["hour_arrival"]==selected_hour]
+    if weekends == 1:
+        data = data[(data.day_week == '6 - Sabádo') | (data.day_week == '7 - Domingo')]
+    else:
+        data = data[(data.day_week != '6 - Sabádo') & (data.day_week != '7 - Domingo')]
+
+    subset = data[(data["hour"] >= selected_hour_from) & (data["hour"] <= selected_hour_to)]
+    subset_arrival = data[(data["hour_arrival"] >= selected_hour_from) & (data["hour_arrival"] <= selected_hour_to)]
     
     departure_counts =  subset.groupby("code_station_departure").count()
     # select one column

@@ -41,7 +41,7 @@ def get_trip_counts_by_hour(selected_hour_from, selected_hour_to, data, weekends
     locations = locations.loc[:, ["latitude_departure",
                               "longitude_departure",
                               "name_departure",
-                              "distrito_departure"]]
+                              "barrio_departure"]]
     
     if weekends == 1:
         data = data[(data.day_week == '6 - Sabádo') | (data.day_week == '7 - Domingo')]
@@ -125,7 +125,7 @@ def get_trip_counts_total(data):
 def get_table_counts_by_hour(trip_counts, max_rows, orderAsc):
     tabla = trip_counts.reset_index()
     tabla['Estacion'] = tabla['name_departure']
-    tabla['Distrito'] = tabla['distrito_departure']
+    tabla['Barrio'] = tabla['barrio_departure']
     tabla['Llegadas'] = tabla['Arrival Count']
     tabla['Salidas'] = tabla['Departure Count']
     tabla['Balance'] = tabla["Salidas"]-tabla["Llegadas"]
@@ -135,7 +135,7 @@ def get_table_counts_by_hour(trip_counts, max_rows, orderAsc):
     del tabla['Departure Count']
     del tabla['Arrival Count']
     del tabla['name_departure']
-    del tabla['distrito_departure']
+    del tabla['barrio_departure']
     if orderAsc == 1:
          return tabla.head(max_rows).sort_values(by = 'Balance')
     else:

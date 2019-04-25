@@ -1,0 +1,156 @@
+--Velocidad promedio usuarios totales
+Select AVG(speed) from bike_movement_coordinates bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bmc.speed >= 2 and bm.user_type_code in (0,1, 2);
+--Tiempo promedio usuarios totales
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (0,1, 2);
+--Distancia promedio usuarios totales (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (0,1, 2);
+
+--USUARIO ANUAL
+--Velocidad promedio usuario anual
+Select AVG(speed) from bike_movement_coordinates bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bmc.speed >= 2 and bm.user_type_code in (0,1);
+--Tiempo promedio usuario anual
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (0,1);
+--Distancia promedio usuario anual (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (0,1);
+
+--USUARIO OCASIONAL
+--Velocidad promedio usuario ocasional
+Select AVG(speed) from bike_movement_coordinates bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bmc.speed >= 2 and bm.user_type_code in (2);
+--Tiempo promedio usuario ocasional (minutos)
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (2);
+--Distancia promedio usuario ocasional (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (2);
+
+
+---------------------------------------------------------------
+--USUARIOS TOTALES DIAS DE SEMANA
+--Velocidad promedio usuarios totales
+Select AVG(speed) from bike_movement_coordinates bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bmc.speed >= 2 and bm.user_type_code in (0,1, 2) and extract(dow from unplug_hourtime) not in (0,6);
+--Tiempo promedio usuarios totales
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (0,1, 2) and extract(dow from unplug_hourtime) not in (0,6);
+--Distancia promedio usuarios totales (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (0,1, 2) and extract(dow from unplug_hourtime) not in (0,6);
+
+--USUARIOS TOTALES FINES DE SEMANA
+--Velocidad promedio usuarios totales
+Select AVG(speed) from bike_movement_coordinates bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bmc.speed >= 2 and bm.user_type_code in (0,1, 2) and extract(dow from unplug_hourtime) in (0,6);
+--Tiempo promedio usuarios totales
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (0,1, 2) and extract(dow from unplug_hourtime) in (0,6);
+--Distancia promedio usuarios totales (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (0,1, 2) and extract(dow from unplug_hourtime) in (0,6);
+
+
+--USUARIOS ANUALES DIAS DE SEMANA
+--Velocidad promedio usuarios ANUALES
+Select AVG(speed) from bike_movement_coordinates bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bmc.speed >= 2 and bm.user_type_code in (0,1) and extract(dow from unplug_hourtime) not in (0,6);
+--Tiempo promedio usuarios ANUALES
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (0,1) and extract(dow from unplug_hourtime) not in (0,6);
+--Distancia promedio usuarios ANUALES (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (0,1) and extract(dow from unplug_hourtime) not in (0,6);
+
+--USUARIOS ANUALES FINES DE SEMANA
+--Velocidad promedio usuarios ANUALES
+Select AVG(speed) from bike_movement_coordinates bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bmc.speed >= 2 and bm.user_type_code in (0,1) and extract(dow from unplug_hourtime) in (0,6);
+--Tiempo promedio usuarios ANUALES
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (0,1) and extract(dow from unplug_hourtime) in (0,6);
+--Distancia promedio usuarios ANUALES (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (0,1) and extract(dow from unplug_hourtime) in (0,6);
+
+
+--USUARIOS ocasionales DIAS DE SEMANA
+--Velocidad promedio usuarios ocasionales
+Select AVG(speed) from bike_movement_coordinates bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bmc.speed >= 2 and bm.user_type_code in (2) and extract(dow from unplug_hourtime) not in (0,6);
+--Tiempo promedio usuarios ocasionales
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (2) and extract(dow from unplug_hourtime) not in (0,6);
+--Distancia promedio usuarios ocasionales (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (2) and extract(dow from unplug_hourtime) not in (0,6);
+
+--USUARIOS ocasionales FINES DE SEMANA
+--Velocidad promedio usuarios ocasionales
+Select AVG(speed) from bike_movement_coordinates bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bmc.speed >= 2 and bm.user_type_code in (2) and extract(dow from unplug_hourtime) in (0,6);
+--Tiempo promedio usuarios ocasionales
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (2) and extract(dow from unplug_hourtime) in (0,6);
+--Distancia promedio usuarios ocasionales (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (2) and extract(dow from unplug_hourtime) in (0,6);
+
+
+------------------------------------------------------------------------------------
+--HORARIO USUARIOS TOTALES DIAS DE SEMANA
+--Tiempo promedio usuarios totales  DIAS DE SEMANA
+Select AVG(travel_time) / 60 from  bike_movement bm
+where bm.travel_time >= 30 and bm.user_type_code in (0,1)
+and ((unplug_hourtime::time >= '19:00:00' and unplug_hourtime::time <= '23:00:00') or unplug_hourtime::time = '00:00:00');
+--Distancia promedio usuarios totales  DIAS DE SEMANA (km)
+SELECT AVG(ST_Length(geom::geography)) / 1000
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (0,1)
+and ((unplug_hourtime::time >= '19:00:00' and unplug_hourtime::time <= '23:00:00')or unplug_hourtime::time = '00:00:00');
+
+-----------------------------------------------------------------------------------------
+WITH series AS (
+                SELECT generate_series(0, 10000, 500) AS r_from
+), range AS (
+                SELECT r_from, (r_from + 499) AS r_to FROM series -- 9 = interval (10 years) minus 1
+)
+
+SELECT r_from, r_to,
+       (SELECT count(*) as cantidad
+from bike_movement_route_line bmc
+join bike_movement bm on bmc.oid_bike_movement = bm.oid
+where bm.user_type_code in (0,1) and ST_Length(geom::geography)::integer BETWEEN r_from AND r_to) as team_members
+FROM range;

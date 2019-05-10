@@ -32,3 +32,23 @@ def get_day_of_week(date):
         return '6 - Sabádo'
     elif day == 6:
         return '7 - Domingo'
+
+def isWeekend(date):    
+    day = date.weekday()
+    if day == 5 or day == 6:
+        return 1
+    else:
+        return 0
+
+def cast_date(date):
+    return datetime.strptime(date, '%Y-%m-%d')
+
+def get_season_row(row):
+    if row.date >= datetime(row.date.year, 3, 21) and row.date <= datetime(row.date.year, 6, 20):
+        return 'Primavera'
+    elif row.date >= datetime(row.date.year, 6, 21) and row.date <= datetime(row.date.year, 9 , 20):
+        return 'Verano'
+    elif row.date >= datetime(row.date.year, 9, 21) and row.date <= datetime(row.date.year, 12 , 20):
+        return 'Otoño'
+    else:
+        return 'Invierno'

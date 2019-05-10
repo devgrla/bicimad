@@ -1,0 +1,8 @@
+
+select idunplug_station as estacion_origen, s2.name, 
+idplug_station as estacion_destino, s.name,  count (*) cantidad_movimientos
+from bike_movement
+join station s on bike_movement.idplug_station = s.id
+join station s2 on bike_movement.idunplug_station = s2.id
+where user_type_code in (0,1,2) and idunplug_station <> idplug_station
+group by idplug_station, idunplug_station, s.name, s2.name

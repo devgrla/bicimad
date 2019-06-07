@@ -1,0 +1,120 @@
+---
+title: "Modelos Estadisticos BiciMAD"
+author: "Alejandro Galvis V."
+date: "6 de junio de 2019"
+output: html_document
+---
+
+```{r}
+
+data_set <- read.table('data_final', sep = ',', header = TRUE, fileEncoding = 'UTF8')
+test <-data.frame(data_set)
+test$X <- test$season <- test$temp_media <- test$weekend <- NULL
+test$year <- factor(test$year)
+test$month <- factor(test$month)
+test$day <- factor(test$day)
+test$unicom <- factor(test$unicom)
+test$holiday <- factor(test$holiday)
+test2 <- data.frame(test)
+test2 <- na.omit(test2)
+```
+
+```{r}
+poi.mod <- glm(anual_total_use_day ~ precipitation + temp_max + temp_max2 + temp_min 
+               + dioxido_nitrogeno + day + month + year + min_sun + holiday 
+               + unicom, family = poisson, data = test2)
+exp(poi.mod$coef)
+summary(poi.mod)$coef
+```
+
+```{r}
+c(deviance = poi.mod$deviance, d.f = poi.mod$df.residual)
+```
+
+```{r, echo= FALSE}
+n_groups <- 10
+
+mascara <- sample(rep(1:n_groups, nrow(test2) / n_groups), nrow(test2), replace = TRUE)
+
+tmp <- lapply(1:n_groups, function(i){
+  modelo <- glm(anual_total_use_day ~ precipitation + temp_max + temp_max2 + temp_min 
+                + dioxido_nitrogeno + day + month + year + min_sun + holiday 
+                + unicom, family = poisson, data = test2[mascara != i,])
+  tmp <- test2[mascara == i,]
+  tmp$preds <- predict(modelo, tmp, type = "response")
+  tmp
+})
+
+res <- do.call(rbind, tmp)
+rmse_poi <- sqrt(mean((res$anual_total_use_day - res$preds)^2))
+
+tmp <- lapply(1:n_groups, function(i){
+  modelo2 <- glm(anual_total_use_day ~ precipitation + temp_max + temp_max2 + temp_min 
+                 + dioxido_nitrogeno + day * month * year + min_sun + holiday 
+                 + unicom, family = poisson, data = test2[mascara != i,])
+  tmp <- test2[mascara == i,]
+  tmp$preds <- predict(modelo2, tmp, type = "response")
+  tmp
+})
+
+res2 <- do.call(rbind, tmp)
+
+rmse_poi2 <- sqrt(mean((res2$anual_total_use_day - res2$preds)^2))
+```
+
+```{r}
+poi.mod2 <- glm(anual_total_use_day ~ precipitation + temp_max + temp_max2 + temp_min 
+               + dioxido_nitrogeno + day * month * year + min_sun + holiday 
+               + unicom, family = poisson, data = test2)
+```
+
+
+
+```{r}
+rmse_poi <- sqrt(mean((res$anual_total_use_day - res$preds)^2))
+rmse_poi
+
+rmse_poi2 <- sqrt(mean((res2$anual_total_use_day - res2$preds)^2))
+rmse_poi2
+
+plot(res2$preds, res2$anual_total_use_day, ylim=c(1000,15500), xlim=c(1000,15500), 
+     main = 'Real vs. Predicciones Poisson', xlab = 'Usos Predichos', ylab = 'Usos Reales')
+abline(a = 0, b = 1, col = "red")
+```
+
+```{r}
+c(deviance = poi.mod2$deviance, d.f = poi.mod2$df.residual)
+```
+
+```{r}
+library(MASS)
+nb.mod <- glm.nb(anual_total_use_day ~ precipitation + temp_max + temp_max2 + temp_min 
+                 + dioxido_nitrogeno + day + month + year + min_sun + holiday 
+                 + unicom, link = log, data = test2)
+
+exp(nb.mod$coef)
+summary(nb.mod)
+c(theta = summary(nb.mod)$theta, deviance = nb.mod$deviance, d.f = nb.mod$df.residual)
+```
+
+```{r, echo= FALSE}
+tmp <- lapply(1:n_groups, function(i){
+  modelo2 <- glm(anual_total_use_day ~ precipitation + temp_max + temp_max2 + day * month * 
+                   year + min_sun + holiday + unicom, family = poisson, data = test2[mascara != i,])
+  tmp <- test2[mascara == i,]
+  tmp$preds <- predict(modelo2, tmp, type = "response")
+  tmp
+})
+
+resbn <- do.call(rbind, tmp)
+
+rmse_bn <- sqrt(mean((resbn$anual_total_use_day - resbn$preds)^2))
+```
+
+```{r}
+rmse_bn
+
+plot(resbn$preds, resbn$anual_total_use_day, ylim=c(1000,15500), xlim=c(1000,15500), 
+     main = 'Real vs. Predicciones Poisson', xlab = 'Usos Predichos', ylab = 'Usos Reales')
+abline(a = 0, b = 1, col = "red")
+```

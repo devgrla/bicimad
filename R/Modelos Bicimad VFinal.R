@@ -152,7 +152,7 @@ custom <- train(anual_total_use_day ~ .,
                 trControl=tc_RF)
 
 summary(custom)
-plot(custom, main = 'Optimización Modelo Random Forest')
+plot(custom)
 custom$bestTune
 
 
@@ -168,3 +168,64 @@ custom2 <- train(anual_total_use_day ~ .,
 summary(custom2)
 plot(custom2)
 custom2$bestTune
+
+rf <- randomForest(anual_total_use_day ~ ., mtry = 16, ntree = 5000, importance = TRUE, data = test2)
+varImpPlot(rf)
+
+tmp <- lapply(1:n_groups, function(i){
+  modelo3 <- randomForest(anual_total_use_day ~ ., mtry = 16, ntree = 5000, data = test2[mascara != i,])
+  tmp <- test2[mascara == i,]
+  tmp$preds <- predict(modelo3, tmp)
+  tmp
+  })
+
+resrf <- do.call(rbind, tmp)
+rmse_rf <- sqrt(mean((resrf$anual_total_use_day - resrf$preds)^2))
+
+plot(resrf$preds, resrf$anual_total_use_day, ylim=c(1000,15500), xlim=c(1000,15500), 
+     main = 'Real vs. Predicciones Random Forest', xlab = 'Usos Predichos', ylab = 'Usos Reales')
+abline(a = 0, b = 1, col = "red")
+
+
+library(DALEX)
+library(ceterisParibus)
+
+
+tst1 <- tst[, c("anual_total_use_day", "precipitation", "temp_max", "temp_max2", "temp_min", "dioxido_nitrogeno", "day",
+                "month", "year", "holiday", "unicom", "min_sun")]
+
+poi.mod <- glm(anual_total_use_day ~ precipitation + temp_max + temp_max2 + temp_min 
+                + dioxido_nitrogeno + day + month + year + min_sun + holiday 
+                + unicom, family = poisson, data = tst1)
+
+tst2 <- tst[, c("anual_total_use_day", "precipitation", "temp_max", "temp_max2", "day",
+                "month", "year", "holiday", "unicom", "min_sun")]
+
+nb.mod <- glm.nb(anual_total_use_day ~ precipitation + temp_max + temp_max2 + day + month 
+                  + year + min_sun + holiday + unicom, link = log, data = tst2)
+
+tstrf <- tst[, c("anual_total_use_day", "date", "precipitation", "temp_max", "temp_min", "dioxido_nitrogeno", "day",
+                "month", "year", "holiday", "unicom", "min_sun", "wind_speed", "weekend")]
+
+rf <- randomForest(anual_total_use_day ~ ., mtry = 14, ntree = 5000, importance = TRUE, data = tst)
+
+explainer_poi<- explain(poi.mod, data = tst1[,2:12], y = tst1$anual_total_use_day)
+explainer_nb<- explain(nb.mod, data = tst2[,2:10], y = tst2$anual_total_use_day)
+explainer_rf<- explain(rf, data = tst[,2:14], y = tst$anual_total_use_day)
+
+explainer_rf2<- explain(rf, data = tstrf[,2:14], y = tstrf$anual_total_use_day)
+
+new <- tst[400, ]
+new1 <- tst1[400, ]
+new2 <- tst2[400, ]
+
+wi_poi <- what_if(explainer_poi, observation = new1)
+wi_nb <- what_if(explainer_nb, observation = new2)
+wi_rf <- what_if(explainer_rf, observation = new)
+wi_rf2 <- what_if(explainer_rf2, observation = new)
+
+plot(wi_nb, ylim=c(0,18000))
+plot(wi_poi)
+plot(wi_rf2)
+plot(wi_nb, wi_poi)
+
